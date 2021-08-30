@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="[toc] 声明本文问题参考朱小厮的博客。写这个只是为了检验自己最近的学习成果，因为是自己的理解，如果问题，欢迎指出。废话少说，上干货。 正文1. Kafka的用途有哪些？使用场景如何？ 总结下来就几个字:异步处理、日常系统解耦、削峰、提速、广播   如果再说具体一点例如:消息,网站活动追踪,监测指标,日志聚合,流处理,事件采集,提交日志等  2. Kafka中的ISR、AR又代表什么？ISR的伸">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka面试题与答案全套整理">
+<meta property="og:url" content="http://blog.trumandu.top/2019/04/13/Kafka%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E7%AD%94%E6%A1%88%E5%85%A8%E5%A5%97%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="[toc] 声明本文问题参考朱小厮的博客。写这个只是为了检验自己最近的学习成果，因为是自己的理解，如果问题，欢迎指出。废话少说，上干货。 正文1. Kafka的用途有哪些？使用场景如何？ 总结下来就几个字:异步处理、日常系统解耦、削峰、提速、广播   如果再说具体一点例如:消息,网站活动追踪,监测指标,日志聚合,流处理,事件采集,提交日志等  2. Kafka中的ISR、AR又代表什么？ISR的伸">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-04-13T11:36:34.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:24.852Z">
+<meta property="article:author" content="Truman">
+<meta property="article:tag" content="技术分享">
+<meta property="article:tag" content="专栏">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2019/04/13/Kafka%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E7%AD%94%E6%A1%88%E5%85%A8%E5%A5%97%E6%95%B4%E7%90%86/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Kafka面试题与答案全套整理 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Kafka%E7%9A%84%E7%94%A8%E9%80%94%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%A6%82%E4%BD%95%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">1. Kafka的用途有哪些？使用场景如何？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Kafka%E4%B8%AD%E7%9A%84ISR%E3%80%81AR%E5%8F%88%E4%BB%A3%E8%A1%A8%E4%BB%80%E4%B9%88%EF%BC%9FISR%E7%9A%84%E4%BC%B8%E7%BC%A9%E5%8F%88%E6%8C%87%E4%BB%80%E4%B9%88"><span class="nav-number">2.2.</span> <span class="nav-text">2. Kafka中的ISR、AR又代表什么？ISR的伸缩又指什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Kafka%E4%B8%AD%E7%9A%84HW%E3%80%81LEO%E3%80%81LSO%E3%80%81LW%E7%AD%89%E5%88%86%E5%88%AB%E4%BB%A3%E8%A1%A8%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.3.</span> <span class="nav-text">3. Kafka中的HW、LEO、LSO、LW等分别代表什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Kafka%E4%B8%AD%E6%98%AF%E6%80%8E%E4%B9%88%E4%BD%93%E7%8E%B0%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F%E6%80%A7%E7%9A%84%EF%BC%9F"><span class="nav-number">2.4.</span> <span class="nav-text">4. Kafka中是怎么体现消息顺序性的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Kafka%E4%B8%AD%E7%9A%84%E5%88%86%E5%8C%BA%E5%99%A8%E3%80%81%E5%BA%8F%E5%88%97%E5%8C%96%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E6%98%AF%E5%90%A6%E4%BA%86%E8%A7%A3%EF%BC%9F%E5%AE%83%E4%BB%AC%E4%B9%8B%E9%97%B4%E7%9A%84%E5%A4%84%E7%90%86%E9%A1%BA%E5%BA%8F%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.5.</span> <span class="nav-text">5. Kafka中的分区器、序列化器、拦截器是否了解？它们之间的处理顺序是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Kafka%E7%94%9F%E4%BA%A7%E8%80%85%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84%E6%98%AF%E4%BB%80%E4%B9%88%E6%A0%B7%E5%AD%90%E7%9A%84%EF%BC%9F"><span class="nav-number">2.6.</span> <span class="nav-text">6. Kafka生产者客户端的整体结构是什么样子的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Kafka%E7%94%9F%E4%BA%A7%E8%80%85%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%B8%AD%E4%BD%BF%E7%94%A8%E4%BA%86%E5%87%A0%E4%B8%AA%E7%BA%BF%E7%A8%8B%E6%9D%A5%E5%A4%84%E7%90%86%EF%BC%9F%E5%88%86%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.7.</span> <span class="nav-text">7. Kafka生产者客户端中使用了几个线程来处理？分别是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-Kafka%E7%9A%84%E6%97%A7%E7%89%88Scala%E7%9A%84%E6%B6%88%E8%B4%B9%E8%80%85%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%9C%89%E4%BB%80%E4%B9%88%E7%BC%BA%E9%99%B7%EF%BC%9F"><span class="nav-number">2.8.</span> <span class="nav-text">9. Kafka的旧版Scala的消费者客户端的设计有什么缺陷？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E2%80%9C%E6%B6%88%E8%B4%B9%E7%BB%84%E4%B8%AD%E7%9A%84%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%AA%E6%95%B0%E5%A6%82%E6%9E%9C%E8%B6%85%E8%BF%87topic%E7%9A%84%E5%88%86%E5%8C%BA%EF%BC%8C%E9%82%A3%E4%B9%88%E5%B0%B1%E4%BC%9A%E6%9C%89%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E5%88%B0%E6%95%B0%E6%8D%AE%E2%80%9D%E8%BF%99%E5%8F%A5%E8%AF%9D%E6%98%AF%E5%90%A6%E6%AD%A3%E7%A1%AE%EF%BC%9F%E5%A6%82%E6%9E%9C%E4%B8%8D%E6%AD%A3%E7%A1%AE%EF%BC%8C%E9%82%A3%E4%B9%88%E6%9C%89%E6%B2%A1%E6%9C%89%E4%BB%80%E4%B9%88hack%E7%9A%84%E6%89%8B%E6%AE%B5%EF%BC%9F"><span class="nav-number">2.9.</span> <span class="nav-text">10. “消费组中的消费者个数如果超过topic的分区，那么就会有消费者消费不到数据”这句话是否正确？如果不正确，那么有没有什么hack的手段？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E6%B6%88%E8%B4%B9%E8%80%85%E6%8F%90%E4%BA%A4%E6%B6%88%E8%B4%B9%E4%BD%8D%E7%A7%BB%E6%97%B6%E6%8F%90%E4%BA%A4%E7%9A%84%E6%98%AF%E5%BD%93%E5%89%8D%E6%B6%88%E8%B4%B9%E5%88%B0%E7%9A%84%E6%9C%80%E6%96%B0%E6%B6%88%E6%81%AF%E7%9A%84offset%E8%BF%98%E6%98%AFoffset-1"><span class="nav-number">2.10.</span> <span class="nav-text">11. 消费者提交消费位移时提交的是当前消费到的最新消息的offset还是offset+1?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-%E6%9C%89%E5%93%AA%E4%BA%9B%E6%83%85%E5%BD%A2%E4%BC%9A%E9%80%A0%E6%88%90%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%EF%BC%9F"><span class="nav-number">2.11.</span> <span class="nav-text">12. 有哪些情形会造成重复消费？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-%E9%82%A3%E4%BA%9B%E6%83%85%E6%99%AF%E4%B8%8B%E4%BC%9A%E9%80%A0%E6%88%90%E6%B6%88%E6%81%AF%E6%BC%8F%E6%B6%88%E8%B4%B9%EF%BC%9F"><span class="nav-number">2.12.</span> <span class="nav-text">13. 那些情景下会造成消息漏消费？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-KafkaConsumer%E6%98%AF%E9%9D%9E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84%EF%BC%8C%E9%82%A3%E4%B9%88%E6%80%8E%E4%B9%88%E6%A0%B7%E5%AE%9E%E7%8E%B0%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%B6%88%E8%B4%B9%EF%BC%9F"><span class="nav-number">2.13.</span> <span class="nav-text">14. KafkaConsumer是非线程安全的，那么怎么样实现多线程消费？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-%E7%AE%80%E8%BF%B0%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%8E%E6%B6%88%E8%B4%B9%E7%BB%84%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.14.</span> <span class="nav-text">15. 简述消费者与消费组之间的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#16-%E5%BD%93%E4%BD%A0%E4%BD%BF%E7%94%A8kafka-topics-sh%E5%88%9B%E5%BB%BA%EF%BC%88%E5%88%A0%E9%99%A4%EF%BC%89%E4%BA%86%E4%B8%80%E4%B8%AAtopic%E4%B9%8B%E5%90%8E%EF%BC%8CKafka%E8%83%8C%E5%90%8E%E4%BC%9A%E6%89%A7%E8%A1%8C%E4%BB%80%E4%B9%88%E9%80%BB%E8%BE%91%EF%BC%9F"><span class="nav-number">2.15.</span> <span class="nav-text">16. 当你使用kafka-topics.sh创建（删除）了一个topic之后，Kafka背后会执行什么逻辑？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-topic%E7%9A%84%E5%88%86%E5%8C%BA%E6%95%B0%E5%8F%AF%E4%B8%8D%E5%8F%AF%E4%BB%A5%E5%A2%9E%E5%8A%A0%EF%BC%9F%E5%A6%82%E6%9E%9C%E5%8F%AF%E4%BB%A5%E6%80%8E%E4%B9%88%E5%A2%9E%E5%8A%A0%EF%BC%9F%E5%A6%82%E6%9E%9C%E4%B8%8D%E5%8F%AF%E4%BB%A5%EF%BC%8C%E9%82%A3%E5%8F%88%E6%98%AF%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.16.</span> <span class="nav-text">17. topic的分区数可不可以增加？如果可以怎么增加？如果不可以，那又是为什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#18-topic%E7%9A%84%E5%88%86%E5%8C%BA%E6%95%B0%E5%8F%AF%E4%B8%8D%E5%8F%AF%E4%BB%A5%E5%87%8F%E5%B0%91%EF%BC%9F%E5%A6%82%E6%9E%9C%E5%8F%AF%E4%BB%A5%E6%80%8E%E4%B9%88%E5%87%8F%E5%B0%91%EF%BC%9F%E5%A6%82%E6%9E%9C%E4%B8%8D%E5%8F%AF%E4%BB%A5%EF%BC%8C%E9%82%A3%E5%8F%88%E6%98%AF%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.17.</span> <span class="nav-text">18. topic的分区数可不可以减少？如果可以怎么减少？如果不可以，那又是为什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#19-%E5%88%9B%E5%BB%BAtopic%E6%97%B6%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E5%88%86%E5%8C%BA%E6%95%B0%EF%BC%9F"><span class="nav-number">2.18.</span> <span class="nav-text">19. 创建topic时如何选择合适的分区数？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-Kafka%E7%9B%AE%E5%89%8D%E6%9C%89%E9%82%A3%E4%BA%9B%E5%86%85%E9%83%A8topic%EF%BC%8C%E5%AE%83%E4%BB%AC%E9%83%BD%E6%9C%89%E4%BB%80%E4%B9%88%E7%89%B9%E5%BE%81%EF%BC%9F%E5%90%84%E8%87%AA%E7%9A%84%E4%BD%9C%E7%94%A8%E5%8F%88%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.19.</span> <span class="nav-text">20. Kafka目前有那些内部topic，它们都有什么特征？各自的作用又是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#21-%E4%BC%98%E5%85%88%E5%89%AF%E6%9C%AC%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%83%E6%9C%89%E4%BB%80%E4%B9%88%E7%89%B9%E6%AE%8A%E7%9A%84%E4%BD%9C%E7%94%A8%EF%BC%9F"><span class="nav-number">2.20.</span> <span class="nav-text">21. 优先副本是什么？它有什么特殊的作用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#22-Kafka%E6%9C%89%E5%93%AA%E5%87%A0%E5%A4%84%E5%9C%B0%E6%96%B9%E6%9C%89%E5%88%86%E5%8C%BA%E5%88%86%E9%85%8D%E7%9A%84%E6%A6%82%E5%BF%B5%EF%BC%9F%E7%AE%80%E8%BF%B0%E5%A4%A7%E8%87%B4%E7%9A%84%E8%BF%87%E7%A8%8B%E5%8F%8A%E5%8E%9F%E7%90%86"><span class="nav-number">2.21.</span> <span class="nav-text">22. Kafka有哪几处地方有分区分配的概念？简述大致的过程及原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#23-%E7%AE%80%E8%BF%B0Kafka%E7%9A%84%E6%97%A5%E5%BF%97%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">2.22.</span> <span class="nav-text">23. 简述Kafka的日志目录结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#24-Kafka%E4%B8%AD%E6%9C%89%E9%82%A3%E4%BA%9B%E7%B4%A2%E5%BC%95%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-number">2.23.</span> <span class="nav-text">24. Kafka中有那些索引文件？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#25-%E5%A6%82%E6%9E%9C%E6%88%91%E6%8C%87%E5%AE%9A%E4%BA%86%E4%B8%80%E4%B8%AAoffset%EF%BC%8CKafka%E6%80%8E%E4%B9%88%E6%9F%A5%E6%89%BE%E5%88%B0%E5%AF%B9%E5%BA%94%E7%9A%84%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="nav-number">2.24.</span> <span class="nav-text">25. 如果我指定了一个offset，Kafka怎么查找到对应的消息？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#26-%E5%A6%82%E6%9E%9C%E6%88%91%E6%8C%87%E5%AE%9A%E4%BA%86%E4%B8%80%E4%B8%AAtimestamp%EF%BC%8CKafka%E6%80%8E%E4%B9%88%E6%9F%A5%E6%89%BE%E5%88%B0%E5%AF%B9%E5%BA%94%E7%9A%84%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="nav-number">2.25.</span> <span class="nav-text">26. 如果我指定了一个timestamp，Kafka怎么查找到对应的消息？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#27-%E8%81%8A%E4%B8%80%E8%81%8A%E4%BD%A0%E5%AF%B9Kafka%E7%9A%84Log-Retention%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">2.26.</span> <span class="nav-text">27. 聊一聊你对Kafka的Log Retention的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#28-%E8%81%8A%E4%B8%80%E8%81%8A%E4%BD%A0%E5%AF%B9Kafka%E7%9A%84Log-Compaction%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">2.27.</span> <span class="nav-text">28. 聊一聊你对Kafka的Log Compaction的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#29-%E8%81%8A%E4%B8%80%E8%81%8A%E4%BD%A0%E5%AF%B9Kafka%E5%BA%95%E5%B1%82%E5%AD%98%E5%82%A8%E7%9A%84%E7%90%86%E8%A7%A3%EF%BC%88%E9%A1%B5%E7%BC%93%E5%AD%98%E3%80%81%E5%86%85%E6%A0%B8%E5%B1%82%E3%80%81%E5%9D%97%E5%B1%82%E3%80%81%E8%AE%BE%E5%A4%87%E5%B1%82%EF%BC%89"><span class="nav-number">2.28.</span> <span class="nav-text">29. 聊一聊你对Kafka底层存储的理解（页缓存、内核层、块层、设备层）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#30-%E8%81%8A%E4%B8%80%E8%81%8AKafka%E7%9A%84%E5%BB%B6%E6%97%B6%E6%93%8D%E4%BD%9C%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">2.29.</span> <span class="nav-text">30. 聊一聊Kafka的延时操作的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#31-%E8%81%8A%E4%B8%80%E8%81%8AKafka%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.30.</span> <span class="nav-text">31. 聊一聊Kafka控制器的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#32-%E6%B6%88%E8%B4%B9%E5%86%8D%E5%9D%87%E8%A1%A1%E7%9A%84%E5%8E%9F%E7%90%86%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%EF%BC%88%E6%8F%90%E7%A4%BA%EF%BC%9A%E6%B6%88%E8%B4%B9%E8%80%85%E5%8D%8F%E8%B0%83%E5%99%A8%E5%92%8C%E6%B6%88%E8%B4%B9%E7%BB%84%E5%8D%8F%E8%B0%83%E5%99%A8%EF%BC%89"><span class="nav-number">2.31.</span> <span class="nav-text">32. 消费再均衡的原理是什么？（提示：消费者协调器和消费组协调器）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#33-Kafka%E4%B8%AD%E7%9A%84%E5%B9%82%E7%AD%89%E6%98%AF%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E7%9A%84"><span class="nav-number">2.32.</span> <span class="nav-text">33. Kafka中的幂等是怎么实现的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#33-Kafka%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E6%98%AF%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E7%9A%84%EF%BC%88%E8%BF%99%E9%A2%98%E6%88%91%E5%8E%BB%E9%9D%A2%E8%AF%956%E5%AE%B6%E8%A2%AB%E9%97%AE4%E6%AC%A1%EF%BC%8C%E7%85%A7%E7%9D%80%E7%AD%94%E6%A1%88%E5%BF%B5%E4%B9%9F%E8%A6%81%E5%BF%B5%E5%8D%81%E5%87%A0%E5%88%86%E9%92%9F%EF%BC%8C%E9%9D%A2%E8%AF%95%E5%AE%98%E7%AE%80%E7%9B%B4%E5%87%91%E4%B8%8D%E8%A6%81%E8%84%B8%E3%80%82%E5%AE%9E%E5%9C%A8%E8%AE%B0%E4%B8%8D%E4%BD%8F%E7%9A%84%E8%AF%9D%E2%80%A6%E5%8F%AA%E8%A6%81%E7%AE%80%E5%8E%86%E4%B8%8A%E4%B8%8D%E5%86%99%E7%B2%BE%E9%80%9AKafka%E4%B8%80%E8%88%AC%E4%B8%8D%E4%BC%9A%E9%97%AE%E5%88%B0%EF%BC%8C%E6%88%91%E7%AE%80%E5%8E%86%E4%B8%8A%E5%86%99%E7%9A%84%E6%98%AF%E2%80%9C%E7%86%9F%E6%82%89Kafka%EF%BC%8C%E4%BA%86%E8%A7%A3RabbitMQ%E2%80%A6-%E2%80%9D%EF%BC%89"><span class="nav-number">2.33.</span> <span class="nav-text">33. Kafka中的事务是怎么实现的（这题我去面试6家被问4次，照着答案念也要念十几分钟，面试官简直凑不要脸。实在记不住的话…只要简历上不写精通Kafka一般不会问到，我简历上写的是“熟悉Kafka，了解RabbitMQ….”）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#34-Kafka%E4%B8%AD%E6%9C%89%E9%82%A3%E4%BA%9B%E5%9C%B0%E6%96%B9%E9%9C%80%E8%A6%81%E9%80%89%E4%B8%BE%EF%BC%9F%E8%BF%99%E4%BA%9B%E5%9C%B0%E6%96%B9%E7%9A%84%E9%80%89%E4%B8%BE%E7%AD%96%E7%95%A5%E5%8F%88%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="nav-number">2.34.</span> <span class="nav-text">34. Kafka中有那些地方需要选举？这些地方的选举策略又有哪些？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#35-%E5%A4%B1%E6%95%88%E5%89%AF%E6%9C%AC%E6%98%AF%E6%8C%87%E4%BB%80%E4%B9%88%EF%BC%9F%E6%9C%89%E9%82%A3%E4%BA%9B%E5%BA%94%E5%AF%B9%E6%8E%AA%E6%96%BD%EF%BC%9F"><span class="nav-number">2.35.</span> <span class="nav-text">35. 失效副本是指什么？有那些应对措施？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#36-%E5%A4%9A%E5%89%AF%E6%9C%AC%E4%B8%8B%EF%BC%8C%E5%90%84%E4%B8%AA%E5%89%AF%E6%9C%AC%E4%B8%AD%E7%9A%84HW%E5%92%8CLEO%E7%9A%84%E6%BC%94%E5%8F%98%E8%BF%87%E7%A8%8B"><span class="nav-number">2.36.</span> <span class="nav-text">36. 多副本下，各个副本中的HW和LEO的演变过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#37-%E4%B8%BA%E4%BB%80%E4%B9%88Kafka%E4%B8%8D%E6%94%AF%E6%8C%81%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%EF%BC%9F"><span class="nav-number">2.37.</span> <span class="nav-text">37. 为什么Kafka不支持读写分离？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#38-Kafka%E5%9C%A8%E5%8F%AF%E9%9D%A0%E6%80%A7%E6%96%B9%E9%9D%A2%E5%81%9A%E4%BA%86%E5%93%AA%E4%BA%9B%E6%94%B9%E8%BF%9B%EF%BC%9F%EF%BC%88HW-LeaderEpoch%EF%BC%89"><span class="nav-number">2.38.</span> <span class="nav-text">38. Kafka在可靠性方面做了哪些改进？（HW, LeaderEpoch）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#39-Kafka%E4%B8%AD%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E5%92%8C%E9%87%8D%E8%AF%95%E9%98%9F%E5%88%97%EF%BC%9F"><span class="nav-number">2.39.</span> <span class="nav-text">39. Kafka中怎么实现死信队列和重试队列？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#40-Kafka%E4%B8%AD%E7%9A%84%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%EF%BC%88%E8%BF%99%E9%A2%98%E8%A2%AB%E9%97%AE%E7%9A%84%E6%AF%94%E4%BA%8B%E5%8A%A1%E9%82%A3%E9%A2%98%E8%BF%98%E8%A6%81%E5%A4%9A%EF%BC%81%EF%BC%81%EF%BC%81%E5%90%AC%E8%AF%B4%E4%BD%A0%E4%BC%9AKafka%EF%BC%8C%E9%82%A3%E4%BD%A0%E8%AF%B4%E8%AF%B4%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%EF%BC%9F%EF%BC%89"><span class="nav-number">2.40.</span> <span class="nav-text">40. Kafka中的延迟队列怎么实现（这题被问的比事务那题还要多！！！听说你会Kafka，那你说说延迟队列怎么实现？）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#41-Kafka%E4%B8%AD%E6%80%8E%E4%B9%88%E5%81%9A%E6%B6%88%E6%81%AF%E5%AE%A1%E8%AE%A1%EF%BC%9F"><span class="nav-number">2.41.</span> <span class="nav-text">41. Kafka中怎么做消息审计？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#42-Kafka%E4%B8%AD%E6%80%8E%E4%B9%88%E5%81%9A%E6%B6%88%E6%81%AF%E8%BD%A8%E8%BF%B9%EF%BC%9F"><span class="nav-number">2.42.</span> <span class="nav-text">42. Kafka中怎么做消息轨迹？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#43-Kafka%E4%B8%AD%E6%9C%89%E9%82%A3%E4%BA%9B%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0%E6%AF%94%E8%BE%83%E6%9C%89%E6%84%8F%E6%80%9D%EF%BC%9F%E8%81%8A%E4%B8%80%E8%81%8A%E4%BD%A0%E7%9A%84%E7%9C%8B%E6%B3%95"><span class="nav-number">2.43.</span> <span class="nav-text">43. Kafka中有那些配置参数比较有意思？聊一聊你的看法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#44-Kafka%E4%B8%AD%E6%9C%89%E9%82%A3%E4%BA%9B%E5%91%BD%E5%90%8D%E6%AF%94%E8%BE%83%E6%9C%89%E6%84%8F%E6%80%9D%EF%BC%9F%E8%81%8A%E4%B8%80%E8%81%8A%E4%BD%A0%E7%9A%84%E7%9C%8B%E6%B3%95"><span class="nav-number">2.44.</span> <span class="nav-text">44. Kafka中有那些命名比较有意思？聊一聊你的看法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#45-Kafka%E6%9C%89%E5%93%AA%E4%BA%9B%E6%8C%87%E6%A0%87%E9%9C%80%E8%A6%81%E7%9D%80%E9%87%8D%E5%85%B3%E6%B3%A8%EF%BC%9F"><span class="nav-number">2.45.</span> <span class="nav-text">45. Kafka有哪些指标需要着重关注？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#46-%E6%80%8E%E4%B9%88%E8%AE%A1%E7%AE%97Lag%EF%BC%9F-%E6%B3%A8%E6%84%8Fread-uncommitted%E5%92%8Cread-committed%E7%8A%B6%E6%80%81%E4%B8%8B%E7%9A%84%E4%B8%8D%E5%90%8C"><span class="nav-number">2.46.</span> <span class="nav-text">46. 怎么计算Lag？(注意read_uncommitted和read_committed状态下的不同)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#47-Kafka%E7%9A%84%E9%82%A3%E4%BA%9B%E8%AE%BE%E8%AE%A1%E8%AE%A9%E5%AE%83%E6%9C%89%E5%A6%82%E6%AD%A4%E9%AB%98%E7%9A%84%E6%80%A7%E8%83%BD%EF%BC%9F"><span class="nav-number">2.47.</span> <span class="nav-text">47. Kafka的那些设计让它有如此高的性能？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#48-Kafka%E6%9C%89%E4%BB%80%E4%B9%88%E4%BC%98%E7%BC%BA%E7%82%B9%EF%BC%9F"><span class="nav-number">2.48.</span> <span class="nav-text">48. Kafka有什么优缺点？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#49-%E8%BF%98%E7%94%A8%E8%BF%87%E4%BB%80%E4%B9%88%E5%90%8C%E8%B4%A8%E7%B1%BB%E7%9A%84%E5%85%B6%E5%AE%83%E4%BA%A7%E5%93%81%EF%BC%8C%E4%B8%8EKafka%E7%9B%B8%E6%AF%94%E6%9C%89%E4%BB%80%E4%B9%88%E4%BC%98%E7%BC%BA%E7%82%B9%EF%BC%9F"><span class="nav-number">2.49.</span> <span class="nav-text">49. 还用过什么同质类的其它产品，与Kafka相比有什么优缺点？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#50-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9Kafka"><span class="nav-number">2.50.</span> <span class="nav-text">50. 为什么选择Kafka?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#51-%E5%9C%A8%E4%BD%BF%E7%94%A8Kafka%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E8%BF%87%E4%BB%80%E4%B9%88%E5%9B%B0%E9%9A%BE%EF%BC%9F%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3%E7%9A%84%EF%BC%9F"><span class="nav-number">2.51.</span> <span class="nav-text">51. 在使用Kafka的过程中遇到过什么困难？怎么解决的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#52-%E6%80%8E%E4%B9%88%E6%A0%B7%E6%89%8D%E8%83%BD%E7%A1%AE%E4%BF%9DKafka%E6%9E%81%E5%A4%A7%E7%A8%8B%E5%BA%A6%E4%B8%8A%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7%EF%BC%9F"><span class="nav-number">2.52.</span> <span class="nav-text">52. 怎么样才能确保Kafka极大程度上的可靠性？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#53-%E8%81%8A%E4%B8%80%E8%81%8A%E4%BD%A0%E5%AF%B9Kafka%E7%94%9F%E6%80%81%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">2.53.</span> <span class="nav-text">53. 聊一聊你对Kafka生态的理解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/04/13/Kafka%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E7%AD%94%E6%A1%88%E5%85%A8%E5%A5%97%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kafka面试题与答案全套整理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-13 19:36:34" itemprop="dateCreated datePublished" datetime="2019-04-13T19:36:34+08:00">2019-04-13</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>[toc]</p>
+<h2 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h2><p>本文问题参考<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/I-YsRKcjcBv4eOop-jjO0A">朱小厮的博客</a>。写这个只是为了检验自己最近的学习成果，因为是自己的理解，<strong>如果问题，欢迎指出</strong>。废话少说，上干货。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="1-Kafka的用途有哪些？使用场景如何？"><a href="#1-Kafka的用途有哪些？使用场景如何？" class="headerlink" title="1. Kafka的用途有哪些？使用场景如何？"></a>1. Kafka的用途有哪些？使用场景如何？</h3><blockquote>
+<p>总结下来就几个字:异步处理、日常系统解耦、削峰、提速、广播</p>
+</blockquote>
+<blockquote>
+<p>如果再说具体一点例如:消息,网站活动追踪,监测指标,日志聚合,流处理,事件采集,提交日志等</p>
+</blockquote>
+<h3 id="2-Kafka中的ISR、AR又代表什么？ISR的伸缩又指什么"><a href="#2-Kafka中的ISR、AR又代表什么？ISR的伸缩又指什么" class="headerlink" title="2. Kafka中的ISR、AR又代表什么？ISR的伸缩又指什么"></a>2. Kafka中的ISR、AR又代表什么？ISR的伸缩又指什么</h3><blockquote>
+<p>ISR:In-Sync Replicas 副本同步队列</p>
+</blockquote>
+<blockquote>
+<p>AR:Assigned Replicas 所有副本</p>
+</blockquote>
+<blockquote>
+<p>ISR是由leader维护，follower从leader同步数据有一些延迟（包括延迟时间replica.lag.time.max.ms和延迟条数replica.lag.max.messages两个维度, 当前最新的版本0.10.x中只支持replica.lag.time.max.ms这个维度），任意一个超过阈值都会把follower剔除出ISR, 存入OSR（Outof-Sync Replicas）列表，新加入的follower也会先存放在OSR中。AR=ISR+OSR。</p>
+</blockquote>
+<h3 id="3-Kafka中的HW、LEO、LSO、LW等分别代表什么？"><a href="#3-Kafka中的HW、LEO、LSO、LW等分别代表什么？" class="headerlink" title="3. Kafka中的HW、LEO、LSO、LW等分别代表什么？"></a>3. Kafka中的HW、LEO、LSO、LW等分别代表什么？</h3><blockquote>
+<p>HW:High Watermark 高水位，取一个partition对应的ISR中最小的LEO作为HW，consumer最多只能消费到HW所在的位置上一条信息。</p>
+</blockquote>
+<blockquote>
+<p>LEO:LogEndOffset 当前日志文件中下一条待写信息的offset</p>
+</blockquote>
+<blockquote>
+<p>HW/LEO这两个都是指最后一条的下一条的位置而不是指最后一条的位置。</p>
+</blockquote>
+<blockquote>
+<p>LSO:Last Stable Offset 对未完成的事务而言，LSO 的值等于事务中第一条消息的位置(firstUnstableOffset)，对已完成的事务而言，它的值同 HW 相同</p>
+</blockquote>
+<blockquote>
+<p>LW:Low Watermark 低水位, 代表 AR 集合中最小的 logStartOffset 值</p>
+</blockquote>
+<h3 id="4-Kafka中是怎么体现消息顺序性的？"><a href="#4-Kafka中是怎么体现消息顺序性的？" class="headerlink" title="4. Kafka中是怎么体现消息顺序性的？"></a>4. Kafka中是怎么体现消息顺序性的？</h3><blockquote>
+<p>kafka每个partition中的消息在写入时都是有序的，消费时，每个partition只能被每一个group中的一个消费者消费，保证了消费时也是有序的。<br>整个topic不保证有序。如果为了保证topic整个有序，那么将partition调整为1.</p>
+</blockquote>
+<h3 id="5-Kafka中的分区器、序列化器、拦截器是否了解？它们之间的处理顺序是什么？"><a href="#5-Kafka中的分区器、序列化器、拦截器是否了解？它们之间的处理顺序是什么？" class="headerlink" title="5. Kafka中的分区器、序列化器、拦截器是否了解？它们之间的处理顺序是什么？"></a>5. Kafka中的分区器、序列化器、拦截器是否了解？它们之间的处理顺序是什么？</h3><blockquote>
+<p>拦截器-&gt;序列化器-&gt;分区器</p>
+</blockquote>
+<h3 id="6-Kafka生产者客户端的整体结构是什么样子的？"><a href="#6-Kafka生产者客户端的整体结构是什么样子的？" class="headerlink" title="6. Kafka生产者客户端的整体结构是什么样子的？"></a>6. Kafka生产者客户端的整体结构是什么样子的？</h3><h3 id="7-Kafka生产者客户端中使用了几个线程来处理？分别是什么？"><a href="#7-Kafka生产者客户端中使用了几个线程来处理？分别是什么？" class="headerlink" title="7. Kafka生产者客户端中使用了几个线程来处理？分别是什么？"></a>7. Kafka生产者客户端中使用了几个线程来处理？分别是什么？</h3><blockquote>
+<p>2个，主线程和Sender线程。主线程负责创建消息，然后通过分区器、序列化器、拦截器作用之后缓存到累加器RecordAccumulator中。Sender线程负责将RecordAccumulator中消息发送到kafka中.</p>
+</blockquote>
+<h3 id="9-Kafka的旧版Scala的消费者客户端的设计有什么缺陷？"><a href="#9-Kafka的旧版Scala的消费者客户端的设计有什么缺陷？" class="headerlink" title="9. Kafka的旧版Scala的消费者客户端的设计有什么缺陷？"></a>9. Kafka的旧版Scala的消费者客户端的设计有什么缺陷？</h3><h3 id="10-“消费组中的消费者个数如果超过topic的分区，那么就会有消费者消费不到数据”这句话是否正确？如果不正确，那么有没有什么hack的手段？"><a href="#10-“消费组中的消费者个数如果超过topic的分区，那么就会有消费者消费不到数据”这句话是否正确？如果不正确，那么有没有什么hack的手段？" class="headerlink" title="10. “消费组中的消费者个数如果超过topic的分区，那么就会有消费者消费不到数据”这句话是否正确？如果不正确，那么有没有什么hack的手段？"></a>10. “消费组中的消费者个数如果超过topic的分区，那么就会有消费者消费不到数据”这句话是否正确？如果不正确，那么有没有什么hack的手段？</h3><blockquote>
+<p>不正确，通过自定义分区分配策略，可以将一个consumer指定消费所有partition。</p>
+</blockquote>
+<h3 id="11-消费者提交消费位移时提交的是当前消费到的最新消息的offset还是offset-1"><a href="#11-消费者提交消费位移时提交的是当前消费到的最新消息的offset还是offset-1" class="headerlink" title="11. 消费者提交消费位移时提交的是当前消费到的最新消息的offset还是offset+1?"></a>11. 消费者提交消费位移时提交的是当前消费到的最新消息的offset还是offset+1?</h3><blockquote>
+<p>offset+1</p>
+</blockquote>
+<h3 id="12-有哪些情形会造成重复消费？"><a href="#12-有哪些情形会造成重复消费？" class="headerlink" title="12. 有哪些情形会造成重复消费？"></a>12. 有哪些情形会造成重复消费？</h3><blockquote>
+<p>消费者消费后没有commit offset(程序崩溃/强行kill/消费耗时/自动提交偏移情况下unscrible)</p>
+</blockquote>
+<h3 id="13-那些情景下会造成消息漏消费？"><a href="#13-那些情景下会造成消息漏消费？" class="headerlink" title="13. 那些情景下会造成消息漏消费？"></a>13. 那些情景下会造成消息漏消费？</h3><blockquote>
+<p>消费者没有处理完消息 提交offset(自动提交偏移 未处理情况下程序异常结束)</p>
+</blockquote>
+<h3 id="14-KafkaConsumer是非线程安全的，那么怎么样实现多线程消费？"><a href="#14-KafkaConsumer是非线程安全的，那么怎么样实现多线程消费？" class="headerlink" title="14. KafkaConsumer是非线程安全的，那么怎么样实现多线程消费？"></a>14. KafkaConsumer是非线程安全的，那么怎么样实现多线程消费？</h3><blockquote>
+<p>1.在每个线程中新建一个KafkaConsumer</p>
+</blockquote>
+<blockquote>
+<p>2.单线程创建KafkaConsumer，多个处理线程处理消息（难点在于是否要考虑消息顺序性，offset的提交方式）</p>
+</blockquote>
+<h3 id="15-简述消费者与消费组之间的关系"><a href="#15-简述消费者与消费组之间的关系" class="headerlink" title="15. 简述消费者与消费组之间的关系"></a>15. 简述消费者与消费组之间的关系</h3><blockquote>
+<p>消费者从属与消费组，消费偏移以消费组为单位。每个消费组可以独立消费主题的所有数据，同一消费组内消费者共同消费主题数据，每个分区只能被同一消费组内一个消费者消费。</p>
+</blockquote>
+<h3 id="16-当你使用kafka-topics-sh创建（删除）了一个topic之后，Kafka背后会执行什么逻辑？"><a href="#16-当你使用kafka-topics-sh创建（删除）了一个topic之后，Kafka背后会执行什么逻辑？" class="headerlink" title="16. 当你使用kafka-topics.sh创建（删除）了一个topic之后，Kafka背后会执行什么逻辑？"></a>16. 当你使用kafka-topics.sh创建（删除）了一个topic之后，Kafka背后会执行什么逻辑？</h3><blockquote>
+<p>创建:在zk上/brokers/topics/下节点 kafkabroker会监听节点变化创建主题<br>删除:调用脚本删除topic会在zk上将topic设置待删除标志，kafka后台有定时的线程会扫描所有需要删除的topic进行删除</p>
+</blockquote>
+<h3 id="17-topic的分区数可不可以增加？如果可以怎么增加？如果不可以，那又是为什么？"><a href="#17-topic的分区数可不可以增加？如果可以怎么增加？如果不可以，那又是为什么？" class="headerlink" title="17. topic的分区数可不可以增加？如果可以怎么增加？如果不可以，那又是为什么？"></a>17. topic的分区数可不可以增加？如果可以怎么增加？如果不可以，那又是为什么？</h3><blockquote>
+<p>可以</p>
+</blockquote>
+<h3 id="18-topic的分区数可不可以减少？如果可以怎么减少？如果不可以，那又是为什么？"><a href="#18-topic的分区数可不可以减少？如果可以怎么减少？如果不可以，那又是为什么？" class="headerlink" title="18. topic的分区数可不可以减少？如果可以怎么减少？如果不可以，那又是为什么？"></a>18. topic的分区数可不可以减少？如果可以怎么减少？如果不可以，那又是为什么？</h3><blockquote>
+<p>不可以</p>
+</blockquote>
+<h3 id="19-创建topic时如何选择合适的分区数？"><a href="#19-创建topic时如何选择合适的分区数？" class="headerlink" title="19. 创建topic时如何选择合适的分区数？"></a>19. 创建topic时如何选择合适的分区数？</h3><blockquote>
+<p>根据集群的机器数量和需要的吞吐量来决定适合的分区数</p>
+</blockquote>
+<h3 id="20-Kafka目前有那些内部topic，它们都有什么特征？各自的作用又是什么？"><a href="#20-Kafka目前有那些内部topic，它们都有什么特征？各自的作用又是什么？" class="headerlink" title="20. Kafka目前有那些内部topic，它们都有什么特征？各自的作用又是什么？"></a>20. Kafka目前有那些内部topic，它们都有什么特征？各自的作用又是什么？</h3><blockquote>
+<p>__consumer_offsets 以下划线开头，保存消费组的偏移</p>
+</blockquote>
+<h3 id="21-优先副本是什么？它有什么特殊的作用？"><a href="#21-优先副本是什么？它有什么特殊的作用？" class="headerlink" title="21. 优先副本是什么？它有什么特殊的作用？"></a>21. 优先副本是什么？它有什么特殊的作用？</h3><blockquote>
+<p>优先副本 会是默认的leader副本 发生leader变化时重选举会优先选择优先副本作为leader</p>
+</blockquote>
+<h3 id="22-Kafka有哪几处地方有分区分配的概念？简述大致的过程及原理"><a href="#22-Kafka有哪几处地方有分区分配的概念？简述大致的过程及原理" class="headerlink" title="22. Kafka有哪几处地方有分区分配的概念？简述大致的过程及原理"></a>22. Kafka有哪几处地方有分区分配的概念？简述大致的过程及原理</h3><blockquote>
+<p>创建主题时<br>如果不手动指定分配方式 有两种分配方式</p>
+</blockquote>
+<blockquote>
+<p>消费组内分配</p>
+</blockquote>
+<h3 id="23-简述Kafka的日志目录结构"><a href="#23-简述Kafka的日志目录结构" class="headerlink" title="23. 简述Kafka的日志目录结构"></a>23. 简述Kafka的日志目录结构</h3><blockquote>
+<p>每个partition一个文件夹，包含四类文件.index .log  .timeindex  leader-epoch-checkpoint<br>.index .log  .timeindex 三个文件成对出现 前缀为上一个segment的最后一个消息的偏移 log文件中保存了所有的消息 index文件中保存了稀疏的相对偏移的索引 timeindex保存的则是时间索引<br>leader-epoch-checkpoint中保存了每一任leader开始写入消息时的offset 会定时更新<br>follower被选为leader时会根据这个确定哪些消息可用</p>
+</blockquote>
+<h3 id="24-Kafka中有那些索引文件？"><a href="#24-Kafka中有那些索引文件？" class="headerlink" title="24. Kafka中有那些索引文件？"></a>24. Kafka中有那些索引文件？</h3><blockquote>
+<p>如上</p>
+</blockquote>
+<h3 id="25-如果我指定了一个offset，Kafka怎么查找到对应的消息？"><a href="#25-如果我指定了一个offset，Kafka怎么查找到对应的消息？" class="headerlink" title="25. 如果我指定了一个offset，Kafka怎么查找到对应的消息？"></a>25. 如果我指定了一个offset，Kafka怎么查找到对应的消息？</h3><blockquote>
+<p>1.通过文件名前缀数字x找到该绝对offset 对应消息所在文件</p>
+</blockquote>
+<blockquote>
+<p>2.offset-x为在文件中的相对偏移</p>
+</blockquote>
+<blockquote>
+<p>3.通过index文件中记录的索引找到最近的消息的位置</p>
+</blockquote>
+<blockquote>
+<p>4.从最近位置开始逐条寻找</p>
+</blockquote>
+<h3 id="26-如果我指定了一个timestamp，Kafka怎么查找到对应的消息？"><a href="#26-如果我指定了一个timestamp，Kafka怎么查找到对应的消息？" class="headerlink" title="26. 如果我指定了一个timestamp，Kafka怎么查找到对应的消息？"></a>26. 如果我指定了一个timestamp，Kafka怎么查找到对应的消息？</h3><blockquote>
+<p>原理同上 但是时间的因为消息体中不带有时间戳 所以不精确</p>
+</blockquote>
+<h3 id="27-聊一聊你对Kafka的Log-Retention的理解"><a href="#27-聊一聊你对Kafka的Log-Retention的理解" class="headerlink" title="27. 聊一聊你对Kafka的Log Retention的理解"></a>27. 聊一聊你对Kafka的Log Retention的理解</h3><blockquote>
+<p>kafka留存策略包括 删除和压缩两种<br>删除: 根据时间和大小两个方式进行删除 大小是整个partition日志文件的大小<br>超过的会从老到新依次删除 时间指日志文件中的最大时间戳而非文件的最后修改时间<br>压缩: 相同key的value只保存一个 压缩过的是clean 未压缩的dirty  压缩之后的偏移量不连续 未压缩时连续</p>
+</blockquote>
+<h3 id="28-聊一聊你对Kafka的Log-Compaction的理解"><a href="#28-聊一聊你对Kafka的Log-Compaction的理解" class="headerlink" title="28. 聊一聊你对Kafka的Log Compaction的理解"></a>28. 聊一聊你对Kafka的Log Compaction的理解</h3><h3 id="29-聊一聊你对Kafka底层存储的理解（页缓存、内核层、块层、设备层）"><a href="#29-聊一聊你对Kafka底层存储的理解（页缓存、内核层、块层、设备层）" class="headerlink" title="29. 聊一聊你对Kafka底层存储的理解（页缓存、内核层、块层、设备层）"></a>29. 聊一聊你对Kafka底层存储的理解（页缓存、内核层、块层、设备层）</h3><h3 id="30-聊一聊Kafka的延时操作的原理"><a href="#30-聊一聊Kafka的延时操作的原理" class="headerlink" title="30. 聊一聊Kafka的延时操作的原理"></a>30. 聊一聊Kafka的延时操作的原理</h3><h3 id="31-聊一聊Kafka控制器的作用"><a href="#31-聊一聊Kafka控制器的作用" class="headerlink" title="31. 聊一聊Kafka控制器的作用"></a>31. 聊一聊Kafka控制器的作用</h3><h3 id="32-消费再均衡的原理是什么？（提示：消费者协调器和消费组协调器）"><a href="#32-消费再均衡的原理是什么？（提示：消费者协调器和消费组协调器）" class="headerlink" title="32. 消费再均衡的原理是什么？（提示：消费者协调器和消费组协调器）"></a>32. 消费再均衡的原理是什么？（提示：消费者协调器和消费组协调器）</h3><h3 id="33-Kafka中的幂等是怎么实现的"><a href="#33-Kafka中的幂等是怎么实现的" class="headerlink" title="33. Kafka中的幂等是怎么实现的"></a>33. Kafka中的幂等是怎么实现的</h3><blockquote>
+<p>pid+序号实现，单个producer内幂等</p>
+</blockquote>
+<h3 id="33-Kafka中的事务是怎么实现的（这题我去面试6家被问4次，照着答案念也要念十几分钟，面试官简直凑不要脸。实在记不住的话…只要简历上不写精通Kafka一般不会问到，我简历上写的是“熟悉Kafka，了解RabbitMQ…-”）"><a href="#33-Kafka中的事务是怎么实现的（这题我去面试6家被问4次，照着答案念也要念十几分钟，面试官简直凑不要脸。实在记不住的话…只要简历上不写精通Kafka一般不会问到，我简历上写的是“熟悉Kafka，了解RabbitMQ…-”）" class="headerlink" title="33. Kafka中的事务是怎么实现的（这题我去面试6家被问4次，照着答案念也要念十几分钟，面试官简直凑不要脸。实在记不住的话…只要简历上不写精通Kafka一般不会问到，我简历上写的是“熟悉Kafka，了解RabbitMQ….”）"></a>33. Kafka中的事务是怎么实现的（这题我去面试6家被问4次，照着答案念也要念十几分钟，面试官简直凑不要脸。实在记不住的话…只要简历上不写精通Kafka一般不会问到，我简历上写的是“熟悉Kafka，了解RabbitMQ….”）</h3><h3 id="34-Kafka中有那些地方需要选举？这些地方的选举策略又有哪些？"><a href="#34-Kafka中有那些地方需要选举？这些地方的选举策略又有哪些？" class="headerlink" title="34. Kafka中有那些地方需要选举？这些地方的选举策略又有哪些？"></a>34. Kafka中有那些地方需要选举？这些地方的选举策略又有哪些？</h3><h3 id="35-失效副本是指什么？有那些应对措施？"><a href="#35-失效副本是指什么？有那些应对措施？" class="headerlink" title="35. 失效副本是指什么？有那些应对措施？"></a>35. 失效副本是指什么？有那些应对措施？</h3><h3 id="36-多副本下，各个副本中的HW和LEO的演变过程"><a href="#36-多副本下，各个副本中的HW和LEO的演变过程" class="headerlink" title="36. 多副本下，各个副本中的HW和LEO的演变过程"></a>36. 多副本下，各个副本中的HW和LEO的演变过程</h3><h3 id="37-为什么Kafka不支持读写分离？"><a href="#37-为什么Kafka不支持读写分离？" class="headerlink" title="37. 为什么Kafka不支持读写分离？"></a>37. 为什么Kafka不支持读写分离？</h3><h3 id="38-Kafka在可靠性方面做了哪些改进？（HW-LeaderEpoch）"><a href="#38-Kafka在可靠性方面做了哪些改进？（HW-LeaderEpoch）" class="headerlink" title="38. Kafka在可靠性方面做了哪些改进？（HW, LeaderEpoch）"></a>38. Kafka在可靠性方面做了哪些改进？（HW, LeaderEpoch）</h3><h3 id="39-Kafka中怎么实现死信队列和重试队列？"><a href="#39-Kafka中怎么实现死信队列和重试队列？" class="headerlink" title="39. Kafka中怎么实现死信队列和重试队列？"></a>39. Kafka中怎么实现死信队列和重试队列？</h3><h3 id="40-Kafka中的延迟队列怎么实现（这题被问的比事务那题还要多！！！听说你会Kafka，那你说说延迟队列怎么实现？）"><a href="#40-Kafka中的延迟队列怎么实现（这题被问的比事务那题还要多！！！听说你会Kafka，那你说说延迟队列怎么实现？）" class="headerlink" title="40. Kafka中的延迟队列怎么实现（这题被问的比事务那题还要多！！！听说你会Kafka，那你说说延迟队列怎么实现？）"></a>40. Kafka中的延迟队列怎么实现（这题被问的比事务那题还要多！！！听说你会Kafka，那你说说延迟队列怎么实现？）</h3><h3 id="41-Kafka中怎么做消息审计？"><a href="#41-Kafka中怎么做消息审计？" class="headerlink" title="41. Kafka中怎么做消息审计？"></a>41. Kafka中怎么做消息审计？</h3><h3 id="42-Kafka中怎么做消息轨迹？"><a href="#42-Kafka中怎么做消息轨迹？" class="headerlink" title="42. Kafka中怎么做消息轨迹？"></a>42. Kafka中怎么做消息轨迹？</h3><h3 id="43-Kafka中有那些配置参数比较有意思？聊一聊你的看法"><a href="#43-Kafka中有那些配置参数比较有意思？聊一聊你的看法" class="headerlink" title="43. Kafka中有那些配置参数比较有意思？聊一聊你的看法"></a>43. Kafka中有那些配置参数比较有意思？聊一聊你的看法</h3><h3 id="44-Kafka中有那些命名比较有意思？聊一聊你的看法"><a href="#44-Kafka中有那些命名比较有意思？聊一聊你的看法" class="headerlink" title="44. Kafka中有那些命名比较有意思？聊一聊你的看法"></a>44. Kafka中有那些命名比较有意思？聊一聊你的看法</h3><h3 id="45-Kafka有哪些指标需要着重关注？"><a href="#45-Kafka有哪些指标需要着重关注？" class="headerlink" title="45. Kafka有哪些指标需要着重关注？"></a>45. Kafka有哪些指标需要着重关注？</h3><blockquote>
+<p>生产者关注MessagesInPerSec、BytesOutPerSec、BytesInPerSec 消费者关注消费延迟Lag</p>
+</blockquote>
+<h3 id="46-怎么计算Lag？-注意read-uncommitted和read-committed状态下的不同"><a href="#46-怎么计算Lag？-注意read-uncommitted和read-committed状态下的不同" class="headerlink" title="46. 怎么计算Lag？(注意read_uncommitted和read_committed状态下的不同)"></a>46. 怎么计算Lag？(注意read_uncommitted和read_committed状态下的不同)</h3><blockquote>
+<p>参考 <a target="_blank" rel="noopener" href="http://trumandu.github.io/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/">如何监控kafka消费Lag情况</a></p>
+</blockquote>
+<h3 id="47-Kafka的那些设计让它有如此高的性能？"><a href="#47-Kafka的那些设计让它有如此高的性能？" class="headerlink" title="47. Kafka的那些设计让它有如此高的性能？"></a>47. Kafka的那些设计让它有如此高的性能？</h3><blockquote>
+<p>零拷贝，页缓存，顺序写</p>
+</blockquote>
+<h3 id="48-Kafka有什么优缺点？"><a href="#48-Kafka有什么优缺点？" class="headerlink" title="48. Kafka有什么优缺点？"></a>48. Kafka有什么优缺点？</h3><h3 id="49-还用过什么同质类的其它产品，与Kafka相比有什么优缺点？"><a href="#49-还用过什么同质类的其它产品，与Kafka相比有什么优缺点？" class="headerlink" title="49. 还用过什么同质类的其它产品，与Kafka相比有什么优缺点？"></a>49. 还用过什么同质类的其它产品，与Kafka相比有什么优缺点？</h3><h3 id="50-为什么选择Kafka"><a href="#50-为什么选择Kafka" class="headerlink" title="50. 为什么选择Kafka?"></a>50. 为什么选择Kafka?</h3><blockquote>
+<p>吞吐量高，大数据消息系统唯一选择。</p>
+</blockquote>
+<h3 id="51-在使用Kafka的过程中遇到过什么困难？怎么解决的？"><a href="#51-在使用Kafka的过程中遇到过什么困难？怎么解决的？" class="headerlink" title="51. 在使用Kafka的过程中遇到过什么困难？怎么解决的？"></a>51. 在使用Kafka的过程中遇到过什么困难？怎么解决的？</h3><h3 id="52-怎么样才能确保Kafka极大程度上的可靠性？"><a href="#52-怎么样才能确保Kafka极大程度上的可靠性？" class="headerlink" title="52. 怎么样才能确保Kafka极大程度上的可靠性？"></a>52. 怎么样才能确保Kafka极大程度上的可靠性？</h3><h3 id="53-聊一聊你对Kafka生态的理解"><a href="#53-聊一聊你对Kafka生态的理解" class="headerlink" title="53. 聊一聊你对Kafka生态的理解"></a>53. 聊一聊你对Kafka生态的理解</h3><blockquote>
+<p>confluent全家桶(connect/kafka stream/ksql/center/rest proxy等)，开源监控管理工具kafka-manager,kmanager等</p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/I-YsRKcjcBv4eOop-jjO0A">Kafka面试题全套整理 | 划重点要考！</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013256816/article/details/88985769">Kafka科普系列 | 什么是LSO？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e4879aed5d43">Kafka面试题</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2019/04/13/Kafka%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E7%AD%94%E6%A1%88%E5%85%A8%E5%A5%97%E6%95%B4%E7%90%86/" title="Kafka面试题与答案全套整理">http://blog.trumandu.top/2019/04/13/Kafka面试题与答案全套整理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" rel="tag"># 技术分享</a>
+              <a href="/tags/%E4%B8%93%E6%A0%8F/" rel="tag"># 专栏</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/" rel="prev" title="如何监控kafka消费Lag情况">
+                  <i class="fa fa-chevron-left"></i> 如何监控kafka消费Lag情况
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/04/28/java8%E7%B3%BB%E5%88%97%E4%B8%93%E6%A0%8F%E4%B9%8BDate-Time-API/" rel="next" title="java8系列专栏之Date Time API">
+                  java8系列专栏之Date Time API <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>

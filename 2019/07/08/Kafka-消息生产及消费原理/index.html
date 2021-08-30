@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="Kafka 消息生产及消费原理开篇关于客户端生产和消费不在本文中探讨，本文主要集中在Kafka服务器端对消息如何存储和如何读取消息。 本文主要探讨如下问题：  服务器端接收到消息后如何处理？ 如果我指定了一个offset，Kafka怎么查找到对应的消息？ 如果我指定了一个timestamp，Kafka怎么查找到对应的消息？  正文服务器端接收到消息处理流程Kafka Server接受消息处理流程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka 消息生产及消费原理">
+<meta property="og:url" content="http://blog.trumandu.top/2019/07/08/Kafka-%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E5%8F%8A%E6%B6%88%E8%B4%B9%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="Kafka 消息生产及消费原理开篇关于客户端生产和消费不在本文中探讨，本文主要集中在Kafka服务器端对消息如何存储和如何读取消息。 本文主要探讨如下问题：  服务器端接收到消息后如何处理？ 如果我指定了一个offset，Kafka怎么查找到对应的消息？ 如果我指定了一个timestamp，Kafka怎么查找到对应的消息？  正文服务器端接收到消息处理流程Kafka Server接受消息处理流程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://static.trumandu.top/kafka%20server%E6%8E%A5%E5%8F%97%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://static.trumandu.top/log_append%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://matt33.com/images/kafka/kafka_fetch_request.png">
+<meta property="article:published_time" content="2019-07-08T10:01:55.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:24.843Z">
+<meta property="article:author" content="Truman">
+<meta property="article:tag" content="专栏">
+<meta property="article:tag" content="kafka">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.trumandu.top/kafka%20server%E6%8E%A5%E5%8F%97%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2019/07/08/Kafka-%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E5%8F%8A%E6%B6%88%E8%B4%B9%E5%8E%9F%E7%90%86/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>Kafka 消息生产及消费原理 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka-%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E5%8F%8A%E6%B6%88%E8%B4%B9%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">Kafka 消息生产及消费原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E7%AF%87"><span class="nav-number">1.1.</span> <span class="nav-text">开篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E6%8E%A5%E6%94%B6%E5%88%B0%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.1.</span> <span class="nav-text">服务器端接收到消息处理流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Kafka-Server%E6%8E%A5%E5%8F%97%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">Kafka Server接受消息处理流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Log-append%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">Log append处理流程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consumer-%E8%8E%B7%E5%8F%96%E6%B6%88%E6%81%AF"><span class="nav-number">1.3.</span> <span class="nav-text">Consumer 获取消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9Aoffset%EF%BC%8CKafka%E6%80%8E%E4%B9%88%E6%9F%A5%E6%89%BE%E5%88%B0%E5%AF%B9%E5%BA%94%E7%9A%84%E6%B6%88%E6%81%AF"><span class="nav-number">1.3.1.</span> <span class="nav-text">指定offset，Kafka怎么查找到对应的消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9Atimestamp%EF%BC%8CKafka%E6%80%8E%E4%B9%88%E6%9F%A5%E6%89%BE%E5%88%B0%E5%AF%B9%E5%BA%94%E7%9A%84%E6%B6%88%E6%81%AF"><span class="nav-number">1.3.2.</span> <span class="nav-text">指定timestamp，Kafka怎么查找到对应的消息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">1.4.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/07/08/Kafka-%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E5%8F%8A%E6%B6%88%E8%B4%B9%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kafka 消息生产及消费原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-07-08 18:01:55" itemprop="dateCreated datePublished" datetime="2019-07-08T18:01:55+08:00">2019-07-08</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Kafka-消息生产及消费原理"><a href="#Kafka-消息生产及消费原理" class="headerlink" title="Kafka 消息生产及消费原理"></a>Kafka 消息生产及消费原理</h1><h2 id="开篇"><a href="#开篇" class="headerlink" title="开篇"></a>开篇</h2><p>关于客户端生产和消费不在本文中探讨，本文主要集中在Kafka服务器端对消息如何存储和如何读取消息。</p>
+<p>本文主要探讨如下问题：</p>
+<ol>
+<li>服务器端接收到消息后如何处理？</li>
+<li>如果我指定了一个offset，Kafka怎么查找到对应的消息？</li>
+<li>如果我指定了一个timestamp，Kafka怎么查找到对应的消息？</li>
+</ol>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="服务器端接收到消息处理流程"><a href="#服务器端接收到消息处理流程" class="headerlink" title="服务器端接收到消息处理流程"></a>服务器端接收到消息处理流程</h3><h4 id="Kafka-Server接受消息处理流程"><a href="#Kafka-Server接受消息处理流程" class="headerlink" title="Kafka Server接受消息处理流程"></a>Kafka Server接受消息处理流程</h4><p><img src="http://static.trumandu.top/kafka%20server%E6%8E%A5%E5%8F%97%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png"></p>
+<p>KafkaApis是Kafka server处理所有请求的入口，在 Kafka 中，每个副本（replica）都会跟日志实例（Log 对象）一一对应，一个副本会对应一个 Log 对象。副本由ReplicaManager管理，对于消息的写入操作在Log与LogSement中进行的。</p>
+<h4 id="Log-append处理流程"><a href="#Log-append处理流程" class="headerlink" title="Log append处理流程"></a>Log append处理流程</h4><p><img src="http://static.trumandu.top/log_append%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png"></p>
+<p>真正的日志写入，还是在 LogSegment 的 <code>append()</code> 方法中完成的，LogSegment 会跟 Kafka 最底层的文件通道、mmap 打交道。数据并不是实时持久化的，mmap只是写入了页缓存，并没有flush进磁盘，当满足<code>if (unflushedMessages &gt;= config.flushInterval) </code>才会真正写入磁盘。</p>
+<h2 id="Consumer-获取消息"><a href="#Consumer-获取消息" class="headerlink" title="Consumer 获取消息"></a>Consumer 获取消息</h2><p><img src="http://matt33.com/images/kafka/kafka_fetch_request.png"></p>
+<h3 id="指定offset，Kafka怎么查找到对应的消息"><a href="#指定offset，Kafka怎么查找到对应的消息" class="headerlink" title="指定offset，Kafka怎么查找到对应的消息"></a>指定offset，Kafka怎么查找到对应的消息</h3><ol>
+<li>通过文件名前缀数字x找到该绝对offset 对应消息所在文件（log/index）</li>
+<li>offset-x为在文件中的相对偏移</li>
+<li>通过相对偏移在index文件找到最近的消息的<strong>位置</strong>(使用二分查找)</li>
+<li>在log文件从最近位置开始逐条寻找</li>
+</ol>
+<p>首先根据offset获取<code>LogSegment</code>，即<code>var segmentEntry = segments.floorEntry(startOffset)</code>segmentEntry 是个抽象的对象，包含log、index,timeindex等对象。</p>
+<p>接下来在index中获取position（物理位置），即<code>val startOffsetAndSize = translateOffset(startOffset)</code></p>
+<p>源码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span>[log] <span class="function">def <span class="title">translateOffset</span><span class="params">(offset: Long, startingFilePosition: Int = <span class="number">0</span>)</span>: LogOffsetPosition </span>= &#123;</span><br><span class="line">    <span class="comment">//二分查找index文件得到下标，再根据算法计算最近的position物理位置</span></span><br><span class="line">    val mapping = offsetIndex.lookup(offset)</span><br><span class="line">    <span class="comment">//根据计算的起始位置开始遍历获取准确的position及size</span></span><br><span class="line">    log.searchForOffsetWithSize(offset, max(mapping.position, startingFilePosition))</span><br><span class="line">  &#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> LogOffsetPosition <span class="title">searchForOffsetWithSize</span><span class="params">(<span class="keyword">long</span> targetOffset, <span class="keyword">int</span> startingPosition)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (FileChannelRecordBatch batch : batchesFrom(startingPosition)) &#123;</span><br><span class="line">            <span class="keyword">long</span> offset = batch.lastOffset();</span><br><span class="line">            <span class="keyword">if</span> (offset &gt;= targetOffset)</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> LogOffsetPosition(offset, batch.position(), batch.sizeInBytes());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里说明一下index中根据下标计算偏移量地址与物理地址：<code>物理地址=n*8+4</code>,<code>偏移量地址=n*8</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> def <span class="title">relativeOffset</span><span class="params">(buffer: ByteBuffer, n: Int)</span>: Int </span>= buffer.getInt(n * entrySize)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> def <span class="title">physical</span><span class="params">(buffer: ByteBuffer, n: Int)</span>: Int </span>= buffer.getInt(n * entrySize + <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="function">override def <span class="title">parseEntry</span><span class="params">(buffer: ByteBuffer, n: Int)</span>: IndexEntry </span>= &#123;</span><br><span class="line">    OffsetPosition(baseOffset + relativeOffset(buffer, n), physical(buffer, n))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>最后根据position在log中截取相应的message，<code>log.slice(startPosition, fetchSize)</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> FileRecords <span class="title">slice</span><span class="params">(<span class="keyword">int</span> position, <span class="keyword">int</span> size)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="comment">//省略校验代码</span></span><br><span class="line">        <span class="keyword">int</span> end = <span class="keyword">this</span>.start + position + size;</span><br><span class="line">        <span class="comment">// handle integer overflow or if end is beyond the end of the file</span></span><br><span class="line">        <span class="keyword">if</span> (end &lt; <span class="number">0</span> || end &gt;= start + sizeInBytes())</span><br><span class="line">            end = start + sizeInBytes();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> FileRecords(file, channel, <span class="keyword">this</span>.start + position, end, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>看到<code>searchForOffsetWithSize</code>有个疑问，上面代码显示返回给客户端的records是批量的，假如提交的offset是这批次的中间一个，那么<strong>返回给Consumer的message是有已经被消费过的信息</strong>，我感觉不可能是这样的，查看了server端代码，再未发现删除已消费的message逻辑。</p>
+<p><strong>Kafka设计者真的这么蠢？？</strong></p>
+<p>随后我查看了客户端consumer源码有发现到如下代码：<code>if (record.offset() &gt;= nextFetchOffset)</code>有对大于指定offset消息抛弃的逻辑。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Record <span class="title">nextFetchedRecord</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (records == <span class="keyword">null</span> || !records.hasNext()) &#123;</span><br><span class="line">                   <span class="comment">//略</span></span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    Record record = records.next();</span><br><span class="line">                    <span class="comment">// skip any records out of range</span></span><br><span class="line">                    <span class="keyword">if</span> (record.offset() &gt;= nextFetchOffset) &#123;</span><br><span class="line">                        <span class="comment">// we only do validation when the message should not be skipped.</span></span><br><span class="line">                        maybeEnsureValid(record);</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// control records are not returned to the user</span></span><br><span class="line">                        <span class="keyword">if</span> (!currentBatch.isControlBatch()) &#123;</span><br><span class="line">                            <span class="keyword">return</span> record;</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            <span class="comment">// Increment the next fetch offset when we skip a control batch.</span></span><br><span class="line">                            nextFetchOffset = record.offset() + <span class="number">1</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>至此得出结论：为了提高server端的响应速度，没有对批量消息进行解压缩，然后精准返回指定信息，而是在客户端解压消息，然后再抛弃已处理过的message，这样就不会存在重复消费的问题。这个问题纠结了半天，不知是否正确，仅是自己的理解，如果有哪位同学对这里有研究，欢迎指出问题。</p>
+<h3 id="指定timestamp，Kafka怎么查找到对应的消息"><a href="#指定timestamp，Kafka怎么查找到对应的消息" class="headerlink" title="指定timestamp，Kafka怎么查找到对应的消息"></a>指定timestamp，Kafka怎么查找到对应的消息</h3><p>略</p>
+<p>类似根据offset获取消息，不过中间是从timeindex中获取position，然后遍历对比timestamp，获取相应的消息。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>1.<a target="_blank" rel="noopener" href="http://matt33.com/2018/03/18/kafka-server-handle-produce-request/">Kafka 源码解析之 Server 端如何处理 Produce 请求（十二）</a></p>
+<p>2.<a target="_blank" rel="noopener" href="http://matt33.com/2018/04/15/kafka-server-handle-fetch-request/">Kafka 源码解析之 Server 端如何处理 Fetch 请求（十三）</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2019/07/08/Kafka-%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E5%8F%8A%E6%B6%88%E8%B4%B9%E5%8E%9F%E7%90%86/" title="Kafka 消息生产及消费原理">http://blog.trumandu.top/2019/07/08/Kafka-消息生产及消费原理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E4%B8%93%E6%A0%8F/" rel="tag"># 专栏</a>
+              <a href="/tags/kafka/" rel="tag"># kafka</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/07/08/kafka-%E9%80%BB%E8%BE%91%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" rel="prev" title="kafka 逻辑架构设计">
+                  <i class="fa fa-chevron-left"></i> kafka 逻辑架构设计
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/07/08/kafka%E5%B9%82%E7%AD%89%E6%80%A7%E5%92%8C%E4%BA%8B%E5%8A%A1%E4%BD%BF%E7%94%A8%E5%8F%8A%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="next" title="kafka幂等性和事务使用及实现原理">
+                  kafka幂等性和事务使用及实现原理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>

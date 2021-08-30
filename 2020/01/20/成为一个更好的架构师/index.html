@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="成为一个更好的架构师本文翻译于SoftwareArchitect,原创翻译，有删减，介意请查看原文，转载请联系我。  多年前，有人问我:”如何成为软件架构师?”。我认为需要必要的技能，经验以及积累知识所需的时间和奉献精神。 1. 内容 软件架构师的定义 软件架构的级别 软件架构师的常规工作内容 软件架构师的重要技能 架构师技术路线图  2. 软件架构师的定义在开始之前，让我们先看看这个定义。  软">
+<meta property="og:type" content="article">
+<meta property="og:title" content="成为一个更好的架构师">
+<meta property="og:url" content="http://blog.trumandu.top/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="成为一个更好的架构师本文翻译于SoftwareArchitect,原创翻译，有删减，介意请查看原文，转载请联系我。  多年前，有人问我:”如何成为软件架构师?”。我认为需要必要的技能，经验以及积累知识所需的时间和奉献精神。 1. 内容 软件架构师的定义 软件架构的级别 软件架构师的常规工作内容 软件架构师的重要技能 架构师技术路线图  2. 软件架构师的定义在开始之前，让我们先看看这个定义。  软">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/3c62fbd3-9d8b-4f39-b431-3c0b1db04794.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/d580deb6-2a63-43c1-9528-b1cdaf05a360.jpg">
+<meta property="article:published_time" content="2020-01-20T09:47:03.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:25.160Z">
+<meta property="article:author" content="Truman">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgkr.cn-bj.ufileos.com/3c62fbd3-9d8b-4f39-b431-3c0b1db04794.png">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>成为一个更好的架构师 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88"><span class="nav-number">1.</span> <span class="nav-text">成为一个更好的架构师</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%86%85%E5%AE%B9"><span class="nav-number">1.1.</span> <span class="nav-text">1. 内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%B8%88%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.2.</span> <span class="nav-text">2. 软件架构师的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E7%9A%84%E7%BA%A7%E5%88%AB"><span class="nav-number">1.3.</span> <span class="nav-text">3. 软件架构的级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%B8%88%E7%9A%84%E5%B8%B8%E8%A7%84%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AE%B9"><span class="nav-number">1.4.</span> <span class="nav-text">4. 软件架构师的常规工作内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%B8%88%E7%9A%84%E9%87%8D%E8%A6%81%E6%8A%80%E8%83%BD"><span class="nav-number">1.5.</span> <span class="nav-text">5. 软件架构师的重要技能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.5.1.</span> <span class="nav-text">（1）设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%86%B3%E5%AE%9A"><span class="nav-number">1.5.2.</span> <span class="nav-text">（2）决定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E7%AE%80%E5%8C%96"><span class="nav-number">1.5.3.</span> <span class="nav-text">（3）简化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%BC%96%E7%A0%81"><span class="nav-number">1.5.4.</span> <span class="nav-text">（4）编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%885%EF%BC%89%E6%96%87%E6%A1%A3"><span class="nav-number">1.5.5.</span> <span class="nav-text">（5）文档</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%886%EF%BC%89%E6%B2%9F%E9%80%9A"><span class="nav-number">1.5.6.</span> <span class="nav-text">（6）沟通</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%887%EF%BC%89%E4%BC%B0%E8%AE%A1"><span class="nav-number">1.5.7.</span> <span class="nav-text">（7）估计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%888%EF%BC%89%E5%B9%B3%E8%A1%A1"><span class="nav-number">1.5.8.</span> <span class="nav-text">（8）平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%889%EF%BC%89%E5%92%A8%E8%AF%A2"><span class="nav-number">1.5.9.</span> <span class="nav-text">（9）咨询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%EF%BC%8810%EF%BC%89%E5%B8%82%E5%9C%BA"><span class="nav-number">1.5.10.</span> <span class="nav-text">（10）市场</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%9E%B6%E6%9E%84%E5%B8%88%E6%8A%80%E6%9C%AF%E8%B7%AF%E7%BA%BF%E5%9B%BE"><span class="nav-number">1.6.</span> <span class="nav-text">6. 架构师技术路线图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%8F%82%E8%80%83"><span class="nav-number">1.7.</span> <span class="nav-text">7. 参考</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          成为一个更好的架构师
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-20 17:47:03" itemprop="dateCreated datePublished" datetime="2020-01-20T17:47:03+08:00">2020-01-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="成为一个更好的架构师"><a href="#成为一个更好的架构师" class="headerlink" title="成为一个更好的架构师"></a>成为一个更好的架构师</h1><p>本文翻译于<a target="_blank" rel="noopener" href="https://github.com/justinamiller/SoftwareArchitect">SoftwareArchitect</a>,原创翻译，有删减，介意请查看原文，转载请联系我。</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/3c62fbd3-9d8b-4f39-b431-3c0b1db04794.png" alt="扫码关注我"></p>
+<p>多年前，有人问我:”如何成为软件架构师?”。我认为需要必要的技能，经验以及积累知识所需的时间和奉献精神。</p>
+<h2 id="1-内容"><a href="#1-内容" class="headerlink" title="1. 内容"></a>1. 内容</h2><ul>
+<li>软件架构师的定义</li>
+<li>软件架构的级别</li>
+<li>软件架构师的常规工作内容</li>
+<li>软件架构师的重要技能</li>
+<li>架构师技术路线图</li>
+</ul>
+<h2 id="2-软件架构师的定义"><a href="#2-软件架构师的定义" class="headerlink" title="2. 软件架构师的定义"></a>2. 软件架构师的定义</h2><p>在开始之前，让我们先看看这个定义。</p>
+<ul>
+<li>软件架构师是一位软件专家，他可以进行高层设计选择并决定技术标准，包括软件编码标准，工具和平台。首席专家被称为首席架构师。（来源：Wikipedia: Software Architect）</li>
+</ul>
+<h2 id="3-软件架构的级别"><a href="#3-软件架构的级别" class="headerlink" title="3. 软件架构的级别"></a>3. 软件架构的级别</h2><p>架构可以被抽象成很多个级别，不同的人会有不同的分发，这里我更喜欢分成三个级别：</p>
+<ul>
+<li><p><strong>应用程序级别</strong>：最低的体系结构级别。专注于一个单一的应用程序。非常详细的底层设计。通常在一个开发团队中进行沟通</p>
+</li>
+<li><p><strong>解决方案级别</strong>：中级架构。专注于满足业务需求（业务解决方案）的一个或多个应用程序。有一些高层次，但主要是低层次的设计。多个开发团队之间的沟通。</p>
+</li>
+<li><p><strong>企业级别</strong>：最高级别的体系结构。专注于多种解决方案。高层次的抽象设计，需要解决方案或应用程序架构师对其进行详细说明。整个组织的沟通，更多详情见<a target="_blank" rel="noopener" href="https://github.com/justinamiller/EnterpriseArchitecture">链接</a></p>
+<h2 id="4-软件架构师的常规工作内容"><a href="#4-软件架构师的常规工作内容" class="headerlink" title="4. 软件架构师的常规工作内容"></a>4. 软件架构师的常规工作内容</h2><p>要了解架构师所需的必要技能，我们首先需要了解常规工作内容。我认为以下（非最终）清单包含最重要的工作内容：</p>
+</li>
+<li><p>定义和决定开发技术和平台</p>
+</li>
+<li><p>定义开发标准，例如编码标准，工具，审查流程，测试方法等。</p>
+</li>
+<li><p>支持识别和理解业务需求</p>
+</li>
+<li><p>设计系统并根据需求做出决策</p>
+</li>
+<li><p>记录并传达架构定义，设计和决策</p>
+</li>
+<li><p>检查并回顾架构和代码，例如，检查定义的模式和编码标准是否正确实施</p>
+</li>
+<li><p>与其他架构师和利益相关者合作</p>
+</li>
+<li><p>指导并咨询开发人员</p>
+</li>
+<li><p>将高级设计改进为低级设计并详细说明。注意：架构是一项连续的工作，尤其是在将其应用于敏捷软件开发中时。因此，这些工作一遍又一遍地进行。</p>
+<h2 id="5-软件架构师的重要技能"><a href="#5-软件架构师的重要技能" class="headerlink" title="5. 软件架构师的重要技能"></a>5. 软件架构师的重要技能</h2><p>为了支撑常规工作内容，需要特定技能。根据我的经验，阅读书籍和讨论，我们可以将其归结为每个软件架构师应具备的以下10种技能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">设计，决定，简化，编码，文档，沟通，估计，平衡，咨询，市场</span><br></pre></td></tr></table></figure>
+<h3 id="（1）设计"><a href="#（1）设计" class="headerlink" title="（1）设计"></a>（1）设计</h3><p>什么是好的设计？这可能是最重要和最具挑战性的问题。我将在理论和实践之间进行区分。以我的经验，两者的结合是最有价值的。让我们从理论开始：</p>
+</li>
+<li><p><strong>了解基本的设计模式</strong>：模式是架构师开发可维护系统所需的最重要工具之一。使用模式，您可以重复使用设计，以通过可靠的解决方案解决常见问题。由GoF编写的《设计模式：可重用的面向对象软件的要素》一书是所有从事软件开发的人必读的书。尽管该模式已发布20多年，但它们仍然是现代软件体系结构的基础。例如，本书描述了模型-视图-控制器（MVC）模式，该模式在许多领域都得到了应用，或者是更新模式的基础，例如MVVM。</p>
+</li>
+<li><p><strong>深入研究模式和反模式</strong>：如果您已经了解所有基本的GoF模式，则可以使用更多的软件设计模式来扩展您的知识。或更深入地研究您感兴趣的领域。我最喜欢的应用程序集成之一是Gregor Hohpe撰写的“ Enterprise Integration Patterns”一书。无论两个应用程序需要交换数据，无论是来自某些旧系统的旧式文件交换还是现代微服务体系结构的交换，这本书都适用于各个领域。</p>
+</li>
+<li><p><strong>了解质量度量</strong>：定义架构不是终点。它有定义，应用和控制指南和编码标准的原因。您出于质量和非功能性要求而这样做。您想要一个可维护，可靠，适应性强，安全，可测试，可伸缩，可用等的系统。要实现所有这些质量属性，一件事情就是应用良好的架构工作。您可以开始更多地了解维基百科上的质量度量。理论很重要。如果您不想成为象牙塔架构师，那么实践同样重要，甚至更为重要。</p>
+</li>
+<li><p><strong>尝试并了解不同的技术堆栈</strong>：如果您想成为一名更好的架构师，我认为这是最重要的活动。试用（新）技术堆栈，并了解它们的兴衰。不同或新技术具有不同的设计方面和模式。您很可能从翻阅抽象幻灯片中不会学到任何东西，而是自己尝试一下，并感到痛苦或缓解。架构师不仅应该具有广泛的知识，而且在某些领域还应具有深厚的知识。掌握所有技术堆栈并不重要，但要对您所在地区的最重要知识有深入的了解。另外，请尝试不使用您所处领域的技术，例如，如果您深入SAP R / 3，则还应该尝试JavaScript，反之亦然。尽管如此，双方仍会对SAP S / 4 Hana的最新进展感到惊讶。例如，您可以自己尝试，然后免费在openSAP上课程。好奇并尝试新事物。还可以尝试一些您几年前不喜欢的东西。</p>
+</li>
+<li><p><strong>分析和理解应用模式</strong>：查看任何当前框架，例如Angular。您可以在实践中研究很多模式，例如“可观察物”。尝试了解它如何在框架中应用，为什么要这样做。而且，如果您真的很专心，请更深入地研究代码并了解其实现方式。</p>
+</li>
+<li><p><strong>充满好奇并作为一个用户</strong>。</p>
+<h3 id="（2）决定"><a href="#（2）决定" class="headerlink" title="（2）决定"></a>（2）决定</h3><p>架构师需要能够做出决定并指导项目或整个组织朝正确的方向发展。</p>
+</li>
+<li><p><strong>知道什么是重要的</strong>：不要浪费时间进行无关紧要的决定或活动。了解重要的事情。据我所知，没有一本书包含这些信息（如果您知道的话，请告诉我）。我个人最喜欢的是这两个特征，我通常会在评估某些重要事项时考虑这些特征：</p>
+<ol>
+<li>概念完整性：如果您决定以一种方式来做，那就坚持下去，即使有时最好以其他方式去做。通常，这会导致更简单的总体概念，简化可理解性并简化维护</li>
+<li>一致性：例如你定义了应用的命名，不用关心是大写还是小写，但是要做到所有的地方都是一个标准，一个表达方式。</li>
+</ol>
+</li>
+<li><p><strong>优先排序</strong>：某些决定至关重要。如果不及早采取措施，就会需要很多的解决方法，这些措施通常不太可能在以后删除，并且是维护的噩梦，或者更糟的是，开发人员只能停止工作，直到做出决定。在这种情况下，有时最好做出“错误”的决定而不是没有做决定。但是在遇到这种情况之前，请考虑优先考虑即将做出的决定。有不同的方法可以这样做。我建议看一下在敏捷软件开发中广泛使用的加权最短作业优先（WSJF）模型。特别是时间紧迫性和风险降低措施对于评估架构决策的优先级至关重要。</p>
+</li>
+<li><p><strong>了解自己的能力</strong>：不要决定能力之外的事情。这很关键，因为如果不考虑的话，它可能会严重破坏您作为架构师的地位。为避免这种情况，请与您的同伴明确您要承担的责任以及角色的一部分。如果架构师不止一个，那么您应该尊重当前部署的架构级别。作为较低级别的架构师，您最好提出有关高层架构的建议，而不是决策。此外，我建议始终与同伴一起检查关键决策。</p>
+</li>
+<li><p><strong>评估多个选项</strong>：涉及决策时，请始终布置多个选项。在我参与的大多数情况下，都有不止一种可能的（好的）选择。仅选择一个选项在两个方面都是不利的：（1）您似乎没有正确地完成工作，（2）阻碍了做出正确的决定。通过定义度量，可以基于事实而不是直觉来比较选项，例如许可费用或期限。这通常会导致更好和更可持续的决策。此外，可以轻松地将决策出售给不同的利益相关者。此外，如果您没有正确评估选项，则在讨论中可能会遗漏参数。</p>
+</li>
+</ul>
+<h3 id="（3）简化"><a href="#（3）简化" class="headerlink" title="（3）简化"></a>（3）简化</h3><p>请记住解决问题的原则Occam’s Razor（它更偏爱简单）。 我将原理解释为：如果您对问题的假设太多而无法解决，则可能会出错或导致不必要的复杂解决方案。 应该减少（简化）假设以得出好的解决方案。</p>
+<ul>
+<li><strong>摇动解决方案</strong>：为了简化解决方案，通常有助于“摇动”解决方案并从不同位置查看它们。尝试通过自上而下和自下而上的方式来塑造解决方案。如果您有数据流或流程，请首先从左到右，再从右到左思考。提出以下问题：“在完美的世界中您的解决方案会发生什么？”或：“ X公司/人会做什么？”（X可能不是您的竞争对手，而是GAFA公司之一。）这两个问题都迫使您减少Occam’s Razor建议的假设。</li>
+<li><strong>退后一步</strong>：经过长时间的深入讨论，通常会得出高度复杂的涂鸦。您永远都不应将这些视为最终结果。退后一步：再次查看全局（抽象级别）。还是有意义吗？然后再次在抽象级别上进行遍历并进行重构。有时，它有助于停止讨论并在第二天继续。至少我的大脑需要一些时间来处理并提出更好，更优雅，更简单的解决方案。</li>
+<li><strong>分而治之</strong>：通过将问题分成更小的部分来简化问题。然后独立解决它们。然后验证小块是否匹配。退后一步以查看总体情况。</li>
+<li><strong>重构不是邪恶的</strong>：如果找不到更好的主意，那么从更复杂的解决方案开始是完全可以的。如果解决方案遇到麻烦，您可以稍后重新考虑解决方案并应用您的学习。重构不是邪恶的。但是在开始重构之前，请记住要进行以下工作：（1）进行足够的自动化测试，以确保系统的正确功能；（2）从利益相关者获取支持。要了解有关重构的更多信息，建议阅读“Refactoring. Improving the Design of Existing Code”，作者是Martin Fowler。</li>
+</ul>
+<h3 id="（4）编码"><a href="#（4）编码" class="headerlink" title="（4）编码"></a>（4）编码</h3><p>即使作为企业架构师（最抽象的体系结构级别），您仍然应该知道开发人员的日常工作。而且，如果您不了解如何完成此操作，则可能会遇到两个主要问题：</p>
+<ol>
+<li>开发人员不会接受您的说法。 </li>
+<li>您不了解开发人员的挑战和需求。</li>
+</ol>
+<ul>
+<li><p><strong>有一个附带项目</strong>：此项目的目的是尝试新技术和工具，以了解当今和未来的开发方式。经验是观察，情感和假设的结合（Kurt Schneider的“软件工程中的经验和知识管理”）。阅读教程或一些利弊是好的。但这仅仅是“书籍知识”。仅当您自己尝试事物时，您才能体验到情绪并建立关于事物好坏的假设。而且，您使用某项技术的时间越长，您的假设就会越好。这将帮助您在日常工作中做出更好的决定。当我开始编程时，我没有代码完成，只有一些实用程序库可以加快开发速度。显然，在这种背景下，我今天会做出错误的决定。今天，我们拥有大量的编程语言，框架，工具，过程和实践。只有您对主要趋势有一定的经验和粗略的了解，才能参与对话并引导开发朝正确的方向发展。</p>
+</li>
+<li><p><strong>找到正确的事物进行尝试</strong>：您无法尝试所有事物。这根本是不可能的。您需要一种更有条理的方法。我最近发现的一种来源是ThoughtWorks的Technology Radar。他们将技术，工具，平台，语言和框架分为四类：采用，试用，评估和保留。 “采用”表示“强烈准备为企业使用做好准备”，“试用”表示“企业应该在一个可以处理风险的项目中进行尝试”，“评估”表示“研究它如何影响您的企业”，“持有”表示“谨慎处理”。通过这种分类，更容易获得新事物的概述及其准备情况，以更好地评估下一步要探索的趋势。</p>
+<h3 id="（5）文档"><a href="#（5）文档" class="headerlink" title="（5）文档"></a>（5）文档</h3><p>架构文档有时或多或少地很重要。 重要文档是例如体系结构决策或代码准则。 编码开始之前通常需要初始文档，并且需要不断完善。 其他文档可以自动生成，因为代码也可以是文档，例如 UML类图。</p>
+</li>
+<li><p><strong>干净的代码</strong>：如果操作正确，代码是最好的文档。一个好的架构师应该能够区分好的代码和坏的代码。罗伯特·C·马丁（Robert C. Martin）所著的“清洁代码”一书是了解更多关于好坏代码的宝贵资源。</p>
+</li>
+<li><p><strong>在可能的情况下生成文档</strong>：系统日新月异，很难更新文档。无论是关于API还是以CMDB形式出现的系统格局：基础信息经常变化太快而无法手动更新相应的文档。示例：对于API，如果您是模型驱动的，则可以基于定义文件自动生成文档，也可以直接从源代码生成文档。为此，存在许多工具，我认为Swagger和RAML是学习更多内容的一个很好的起点。</p>
+</li>
+<li><p><strong>尽可能多地，尽可能少地进行</strong>：无论您需要记录什么文档（例如决策文件），都一次尝试仅关注一件事，并且仅包含关于这件事的必要信息。大量的文档很难阅读和理解。附加信息应存储在附录中。特别是对于决策文件，讲一个有说服力的故事而不是仅仅发表大量论据，更为重要。此外，这为您和您的同事节省了很多时间，而后者需要阅读。看看您过去做过的一些文档（源代码，模型，决策文件等），然后问自己以下问题：“是否包含所有必要的信息才能理解它？”，“确实需要哪些信息，并且可以省略吗？”和“文档中是否有红线？”。</p>
+</li>
+<li><p><strong>了解有关架构框架的更多信息</strong>：该点也可以应用于所有其他“技术”点。我把它放在这里，是因为TOGAF或Zachmann之类的框架正在提供“工具”，这些工具在文档站点上感觉很沉重，尽管它们的附加值并不限于文档。在这样的框架中获得认证可以教会您更系统地解决体系结构。</p>
+</li>
+</ul>
+<h3 id="（6）沟通"><a href="#（6）沟通" class="headerlink" title="（6）沟通"></a>（6）沟通</h3><p>根据我的观察，这是最被低估的技能之一。如果您的设计精湛，却无法传达您的想法，那么您的想法可能会受到较小的影响，甚至无法成功。</p>
+<ul>
+<li><p><strong>了解如何交表达您的想法</strong>：在董事会或活动挂图上进行协作时，必须了解如何正确使用它，以构筑您和您的同行的思想。我发现《 UZMO-用笔思考》是提高我在这一领域技能的好资源。作为架构师，您通常不仅会参加会议，而且通常需要主持会议并主持会议。</p>
+</li>
+<li><p><strong>与大群人进行演讲</strong>：向小群或大群人展示您的想法对您来说应该是可行的。如果您对此感到不舒服，请开始向您最好的朋友介绍。慢慢扩大小组。这是您只能通过做和离开自己的舒适区来学习的东西。请耐心等待，此过程可能需要一些时间。</p>
+</li>
+<li><p><strong>找到正确的沟通水平</strong>：不同的利益相关者有不同的兴趣和看法。需要在其级别上对它们进行单独处理。在进行交流之前，请退后一步并检查您要共享的信息是否具有正确的级别，有关抽象性，内容，目标，动机等。示例：开发人员通常对解决方案的很少细节感兴趣，而经理则对此感兴趣。宁愿知道哪个选项可以节省最多的钱。</p>
+</li>
+<li><p><strong>经常交流</strong>：如果没有人知道，一个出色的架构将毫无价值。定期并在每个（组织）级别上分发目标体系结构及其背后的思想。安排与开发人员，建筑师和管理人员的会议，以向他们展示所需或已定义的方式。</p>
+</li>
+<li><p><strong>保持透明</strong>：定期交流只能部分缓解缺少的透明度。您需要使决策背后的原因透明化。特别是，如果人们不参与决策过程，则很难理解和遵循其背后的决策和理由。</p>
+</li>
+<li><p><strong>随时准备做一个演讲</strong>：总是会有人提出问题，而您想立即给出正确的答案。尝试始终将最重要的幻灯片放在一个可以显示和解释的合并集中。它为您节省了大量时间，并为您提供安全保护。</p>
+<h3 id="（7）估计"><a href="#（7）估计" class="headerlink" title="（7）估计"></a>（7）估计</h3></li>
+<li><p><strong>了解基本的项目管理原则</strong>：作为架构师或首席开发人员，经常会要求您提供估计以实现您的想法：多长时间，花费多少，多少人，哪些技能等？当然，如果您打算引入新的工具或框架，则需要为此类“管理”问题提供答案。最初，您应该能够进行粗略的估算，例如几天，几个月或几年。并且不要忘记，这不仅涉及实现，还有更多活动需要考虑，例如需求工程，测试和修复错误。因此，您应该了解所使用的软件开发过程的活动。您可以应用以获得更好的估计的一件事是使用过去的数据并从中得出您的预测。如果您没有过去的数据，也可以尝试使用Barry W. Boehm的COCOMO之类的方法。如果您部署在敏捷项目中，请学习如何进行估算和正确计划：Mike Cohn撰写的《敏捷估算和规划》一书对此领域提供了扎实的概述。</p>
+</li>
+<li><p><strong>评估“未知”架构</strong>：作为架构师，您还应该能够评估架构在当前或将来上下文中的适用性。这不是一件容易的事，但是您可以通过准备一系列常见于每种架构的问题来为它做准备。它不仅涉及架构，还涉及系统的管理方式，因为这也使您了解质量。我建议始终准备一些问题并准备使用。一些一般性问题的想法：</p>
+<ol>
+<li>设计实践：体系结构遵循哪些模式？因此，它们是否正确使用？设计遵循红线还是增长不受控制？是否有清晰的结构和关注点分离？</li>
+<li>开发实践：制定并遵循了代码准则？代码如何版本化？部署实践？</li>
+<li>质量保证：测试自动化范围？静态代码分析到位并取得良好结果？同行评论到位？</li>
+<li>安全性：有哪些安全概念？内置安全性？渗透测试或自动安全分析工具是否到位并经常使用？<h3 id="（8）平衡"><a href="#（8）平衡" class="headerlink" title="（8）平衡"></a>（8）平衡</h3></li>
+</ol>
+</li>
+<li><p><strong>质量是有代价的</strong>：前面我谈到了质量和非功能性需求。如果您过度使用体系结构，则会增加成本并可能降低开发速度。您需要平衡架构和功能需求。应避免过度设计。</p>
+</li>
+<li><p><strong>解决矛盾的目标</strong>：矛盾的目标的一个典型示例是短期和长期目标。项目通常倾向于构建最简单的解决方案，而架构师则具有长远的眼光。通常，简单的解决方案不适合长期解决方案，并且有被以后抛弃的风险（降低成本）。为了避免实现错误的方向，需要考虑两点：</p>
+<ol>
+<li>开发人员和企业需要了解长期愿景及其收益，以适应其解决方案</li>
+<li>负责预算的经理需要参与以了解财务影响。不必直接将100％的远景图放置在适当的位置，但是发达的图块应该适合其中。</li>
+</ol>
+</li>
+<li><p><strong>冲突管理</strong>：架构师通常是具有不同背景的多个小组之间的粘合剂。这可能会导致不同级别的通信发生冲突。为了找到一个能够反映长期战略目标的平衡解决方案，通常架构师的作用就是帮助克服冲突。关于传播理论的起点是舒尔茨·冯·图恩的“四耳模型”。基于此模型，可以显示并推论很多。但是，该理论需要一些实践，在交流研讨会上应该有经验。</p>
+<h3 id="（9）咨询"><a href="#（9）咨询" class="headerlink" title="（9）咨询"></a>（9）咨询</h3><p>在咨询和辅导方面，积极主动可能是您最好的选择。 如果询问您，通常为时已晚。 而您想要避免在项目现场上进行清理。 您需要以某种方式预见接下来的几周，几个月甚至几年的时间，并为下一步做好准备。</p>
+</li>
+<li><p><strong>有远见</strong>：如果您部署一个项目，无论是传统的瀑布式方法还是敏捷方法，您始终需要对要实现的中长期目标有一个远见。这不是一个详细的概念，而是一个通往每个人都可以工作的路线图。由于您无法一次完成所有工作（这是一段旅程），因此我更喜欢使用成熟度模型。它们给出了易于使用的清晰结构，并且每次都给出了当前的进度状态。对于不同的方面，我使用不同的模型，例如开发实践或持续交付。成熟度模型中的每个级别都有明确的要求，这些要求遵循SMART准则，以便轻松衡量是否已达到要求。我发现一个很好的例子是持续交付。</p>
+</li>
+<li><p><strong>建立实践社区（CoP）</strong>：在共同兴趣小组之间交流经验和知识有助于分发思想和标准化方法。例如，您可以每三个月左右将所有JavaScript开发人员和架构师聚集在一个房间中，讨论过去和当前的挑战以及如何解决它们或采用新的方法论和方法。架构师可以共享，讨论和调整其愿景，开发人员可以共享经验并向同行学习。这样的回合不仅可以为企业带来极大的好处，也可以为个人本身带来极大的好处，因为它有助于建立更强大的网络并传播思想。还可以查看SAFe框架中的文章实践社区，该文章在敏捷环境中解释了CoP概念。</p>
+</li>
+<li><p><strong>进行公开会议</strong>：误解或模棱两可的原因之一是缺乏沟通。阻止固定时间段，例如每周30分钟，用于与同行交流热门话题。本届会议没有任何议程可以讨论。尝试当场解决小事。安排对更复杂主题的后续行动。</p>
+<h3 id="（10）市场"><a href="#（10）市场" class="headerlink" title="（10）市场"></a>（10）市场</h3><p>您的想法很棒，您已经很好地传达了他们的想法，但仍然没人愿意遵循吗？那么您可能缺乏营销技巧。</p>
+</li>
+<li><p><strong>激励并说服</strong>：公司如何说服您购买产品？他们证明了它的价值和好处。但不仅仅是5点。他们包装得很好，并使其尽可能容易消化。</p>
+<ol>
+<li>原型：显示您的想法的原型。有很多用于创建原型的工具。对于喜欢SAP的企业，请访问build.me，在其中您可以快速轻松地创建外观漂亮且可单击的UI5应用程序。</li>
+<li>使用视频：除了“无聊的幻灯片”，您还可以显示一个视频，该视频可以演示您的想法或至少是方向。但是请不要过度营销：从长远来看，内容为王。如果您的话不正确，从长远来看，这将损害您的声誉。</li>
+</ol>
+</li>
+<li><p><strong>为您的想法而奋斗并坚持不懈</strong>：人们有时不喜欢您的想法，或者他们懒得遵循。如果您真的对自己的想法深信不疑，则应不断追求并“奋斗”。有时这是必要的。具有长期目标的体系结构决策通常不是最容易的：开发人员不喜欢它们，因为它们的开发更加复杂。经理们不喜欢它们，因为它们在短期内更昂贵。这是您要坚持不懈并进行谈判的工作。</p>
+</li>
+<li><p><strong>寻找盟友</strong>：很难独自建立或执行您的想法，甚至是不可能的。尝试找到可以支持和说服他人的盟友。使用您的网络。如果还没有，请立即开始构建。您可以从与（思想开放的）同事讨论您的想法开始。如果他们喜欢它，或者至少喜欢它的一部分，那么如果别人提出来，他们很可能会支持您的想法（“ X的想法很有趣。”）。如果他们不喜欢，问为什么：也许您错过了什么？还是您的故事不够令人信服？下一步是找到具有决定权的盟友。要求开放的讨论。如果您担心讨论，请记住，有时您需要离开舒适区。</p>
+</li>
+<li><p><strong>重复，相信它</strong>：“ […]研究表明，反复接触某个观点会使人们相信该观点更为普遍，即使该观点仅来自一个人。”（来源：《金融品牌》）经常发布一些消息，这可以帮助说服人们。但请注意：从我的角度来看，应该明智地使用这种策略，因为它可能适得其反，成为糟糕的营销技巧。</p>
+<h2 id="6-架构师技术路线图"><a href="#6-架构师技术路线图" class="headerlink" title="6. 架构师技术路线图"></a>6. 架构师技术路线图</h2><p><img src="https://imgkr.cn-bj.ufileos.com/d580deb6-2a63-43c1-9528-b1cdaf05a360.jpg"></p>
+</li>
+</ul>
+<h2 id="7-参考"><a href="#7-参考" class="headerlink" title="7. 参考"></a>7. 参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/justinamiller/SoftwareArchitect">SoftwareArchitect</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/" title="成为一个更好的架构师">http://blog.trumandu.top/2020/01/20/成为一个更好的架构师/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/12/17/Newegg-Kafka-%E5%B9%B3%E5%8F%B0%E5%8C%96%E7%9A%84%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/" rel="prev" title="Newegg Kafka 平台化的一点经验">
+                  <i class="fa fa-chevron-left"></i> Newegg Kafka 平台化的一点经验
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/03/26/%E4%B8%80%E7%AB%99%E5%BC%8FKafka%E5%B9%B3%E5%8F%B0KafkaCenter-%E5%BC%80%E6%BA%90%E5%95%A6/" rel="next" title="一站式Kafka平台KafkaCenter-开源啦">
+                  一站式Kafka平台KafkaCenter-开源啦 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>

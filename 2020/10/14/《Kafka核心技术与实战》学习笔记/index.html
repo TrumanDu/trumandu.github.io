@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="只是记录自己不知道的知识点，或者经常容易忘的内容,想知道更多的信息建议看课程或者找我聊天交换技能。在课程的内容基础之上，补充了一些自己知道的知识点。  Kafka的认知 分布式消息引擎平台 分布式实时流式处理平台  早期Kafka社区对Kafka的定位为⼀个分布式、分区化且带备份功能的提交⽇志（Commit Log）服务,近期在官网彻底更改为分布式实时流式处理平台。 Kafka流式处理框架的优势">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Kafka核心技术与实战》学习笔记">
+<meta property="og:url" content="http://blog.trumandu.top/2020/10/14/%E3%80%8AKafka%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%AE%9E%E6%88%98%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="只是记录自己不知道的知识点，或者经常容易忘的内容,想知道更多的信息建议看课程或者找我聊天交换技能。在课程的内容基础之上，补充了一些自己知道的知识点。  Kafka的认知 分布式消息引擎平台 分布式实时流式处理平台  早期Kafka社区对Kafka的定位为⼀个分布式、分区化且带备份功能的提交⽇志（Commit Log）服务,近期在官网彻底更改为分布式实时流式处理平台。 Kafka流式处理框架的优势">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://static.trumandu.top/kafka-core_tech.png">
+<meta property="og:image" content="http://static.trumandu.top/kafka_request.png">
+<meta property="og:image" content="http://static.trumandu.top/kafka_group_state.png">
+<meta property="og:image" content="http://static.trumandu.top/kafka_group_change_status.png">
+<meta property="og:image" content="http://static.trumandu.top/2020-10-14-kafka_core-hw.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190814184301298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21hZG9uZ3l1MTI1OTg5MjkzNg==,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2020-10-14T12:43:00.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:25.108Z">
+<meta property="article:author" content="Truman">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.trumandu.top/kafka-core_tech.png">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2020/10/14/%E3%80%8AKafka%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%AE%9E%E6%88%98%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>《Kafka核心技术与实战》学习笔记 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E7%9A%84%E8%AE%A4%E7%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">Kafka的认知</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E6%B5%81%E5%BC%8F%E5%A4%84%E7%90%86%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">2.</span> <span class="nav-text">Kafka流式处理框架的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84Rebalance"><span class="nav-number">3.</span> <span class="nav-text">避免不必要的Rebalance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85TCP%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">消费者TCP管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%A8%E9%9B%86%E7%BE%A4%E5%A4%87%E4%BB%BD%E8%A7%A3%E5%86%B3%E2%BD%85%E6%A1%88"><span class="nav-number">5.</span> <span class="nav-text">跨集群备份解决⽅案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E5%89%AF%E6%9C%AC%E6%9C%BA%E5%88%B6"><span class="nav-number">6.</span> <span class="nav-text">Kafka副本机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka%E5%88%A4%E6%96%ADFollower-%E6%98%AF%E5%90%A6%E4%B8%8ELeader%E5%90%8C%E6%AD%A5%E7%9A%84%E6%A0%87%E5%87%86"><span class="nav-number">6.1.</span> <span class="nav-text">Kafka判断Follower 是否与Leader同步的标准</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unclean%E9%A2%86%E5%AF%BC%E8%80%85%E9%80%89%E4%B8%BE%EF%BC%88Unclean-Leader-Election%EF%BC%89"><span class="nav-number">6.2.</span> <span class="nav-text">Unclean领导者选举（Unclean Leader Election）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E8%AF%B7%E6%B1%82%E6%98%AF%E6%80%8E%E4%B9%88%E8%A2%AB%E5%A4%84%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">Kafka请求是怎么被处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka-JMX%E6%8C%87%E6%A0%87%E7%9B%91%E6%8E%A7"><span class="nav-number">8.</span> <span class="nav-text">Kafka JMX指标监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E5%B8%B8%E7%94%A8Broker%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE"><span class="nav-number">9.</span> <span class="nav-text">Kafka常用Broker动态配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E4%BC%98Kafka"><span class="nav-number">10.</span> <span class="nav-text">调优Kafka</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%A4%A7%E5%90%9E%E5%90%90%E9%87%8F"><span class="nav-number">10.1.</span> <span class="nav-text">增大吞吐量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%8D%E4%BD%8E%E5%BB%B6%E6%97%B6"><span class="nav-number">10.2.</span> <span class="nav-text">降低延时</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84%E7%8A%B6%E6%80%81%E5%8F%8A%E5%90%84%E4%B8%AA%E7%8A%B6%E6%80%81%E6%B5%81%E8%BD%AC"><span class="nav-number">11.</span> <span class="nav-text">消费者组状态及各个状态流转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%BE%BC%E2%BD%94%E4%BD%8D%E5%92%8CLEO%E7%9A%84%E6%9B%B4%E6%96%B0%E6%9C%BA%E5%88%B6"><span class="nav-number">12.</span> <span class="nav-text">⾼⽔位和LEO的更新机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E6%B0%B4%E4%BD%8D%E4%BD%9C%E7%94%A8"><span class="nav-number">12.1.</span> <span class="nav-text">高水位作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Leader%E5%89%AF%E6%9C%AC"><span class="nav-number">12.2.</span> <span class="nav-text">Leader副本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Follower%E5%89%AF%E6%9C%AC"><span class="nav-number">12.3.</span> <span class="nav-text">Follower副本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Leader-Epoch"><span class="nav-number">13.</span> <span class="nav-text">Leader Epoch</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2020/10/14/%E3%80%8AKafka%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%AE%9E%E6%88%98%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Kafka核心技术与实战》学习笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-14 20:43:00" itemprop="dateCreated datePublished" datetime="2020-10-14T20:43:00+08:00">2020-10-14</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>只是记录自己不知道的知识点，或者经常容易忘的内容,想知道更多的信息建议看课程或者找我聊天交换技能。在课程的内容基础之上，补充了一些自己知道的知识点。</p>
+<p><img src="http://static.trumandu.top/kafka-core_tech.png"></p>
+<h2 id="Kafka的认知"><a href="#Kafka的认知" class="headerlink" title="Kafka的认知"></a>Kafka的认知</h2><ul>
+<li>分布式消息引擎平台</li>
+<li>分布式实时流式处理平台</li>
+</ul>
+<p>早期Kafka社区对Kafka的定位为⼀个分布式、分区化且带备份功能的提交⽇志（Commit Log）服务,近期在官网彻底更改为分布式实时流式处理平台。</p>
+<h2 id="Kafka流式处理框架的优势"><a href="#Kafka流式处理框架的优势" class="headerlink" title="Kafka流式处理框架的优势"></a>Kafka流式处理框架的优势</h2><ul>
+<li>更容易实现端到端的正确性（Correctness）</li>
+<li>轻量型，嵌入式流式计算的定位</li>
+</ul>
+<h2 id="避免不必要的Rebalance"><a href="#避免不必要的Rebalance" class="headerlink" title="避免不必要的Rebalance"></a>避免不必要的Rebalance</h2><ul>
+<li>session.timeout.ms</li>
+<li> heartbeat.interval.ms </li>
+<li>max.poll.interval.ms </li>
+<li>GC参数</li>
+</ul>
+<p>session.timout.ms决定了Consumer存活性的时间间隔</p>
+<p>heartbeat.interval.ms决定存活心跳发送间隔。</p>
+<p>max.poll.interval.ms 它限定了Consumer端应⽤程序两次调⽤poll⽅法的最⼤时间间隔。</p>
+<h2 id="消费者TCP管理"><a href="#消费者TCP管理" class="headerlink" title="消费者TCP管理"></a>消费者TCP管理</h2><p>消费者实例在<strong>KafkaConsumer.poll</strong>建立TCP连接，主要分为3类连接：</p>
+<ol>
+<li>确定协调者和获取集群元数据。</li>
+<li> 连接协调者，令其执⾏组成员管理操作。 </li>
+<li>执⾏实际的消息获取。</li>
+</ol>
+<p>第一类连接仅在开始前建立，稍后（第三类创建成功）就会销毁，consumer实例会长期保留2,3类连接。</p>
+<p>Consumer实例会长期建立broker数量（分区所在broker数量）+1个连接。</p>
+<p><strong>TCP连接的三个时机：</strong></p>
+<ol>
+<li>发起FindCoordinator请求时</li>
+<li>连接协调者时</li>
+<li>消费数据时</li>
+</ol>
+<p><strong>何时关闭TCP连接：</strong></p>
+<ol>
+<li>⼿动调⽤KafkaConsumer.close()⽅法</li>
+<li>执⾏Kill命令</li>
+<li>Kafka⾃动关闭（是由消费者端参数connection.max.idle.ms控制的，该参数现在的默认值是9分钟）</li>
+</ol>
+<h2 id="跨集群备份解决⽅案"><a href="#跨集群备份解决⽅案" class="headerlink" title="跨集群备份解决⽅案"></a>跨集群备份解决⽅案</h2><ol>
+<li>MirrorMaker</li>
+<li>Uber的uReplicator⼯具</li>
+<li>LinkedIn开发的Brooklin Mirror Maker⼯具</li>
+<li>Confluent公司研发的Replicator⼯具</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0">MirrorMaker2.0</a>已经发布（2.4.0+）基于connector重写了MirrorMaker。目前我们公司使用自研的Kafka connector实现跨集群数据镜像。</p>
+<h2 id="Kafka副本机制"><a href="#Kafka副本机制" class="headerlink" title="Kafka副本机制"></a>Kafka副本机制</h2><h3 id="Kafka判断Follower-是否与Leader同步的标准"><a href="#Kafka判断Follower-是否与Leader同步的标准" class="headerlink" title="Kafka判断Follower 是否与Leader同步的标准"></a>Kafka判断Follower 是否与Leader同步的标准</h3><p>Broker端参数<strong>replica.lag.time.max.ms</strong>参数值，这个参数的含义是Follower副本能够落后Leader副本的最⻓时 间间隔，当前默认值是10秒。</p>
+<h3 id="Unclean领导者选举（Unclean-Leader-Election）"><a href="#Unclean领导者选举（Unclean-Leader-Election）" class="headerlink" title="Unclean领导者选举（Unclean Leader Election）"></a>Unclean领导者选举（Unclean Leader Election）</h3><p>Broker端参数unclean.leader.election.enable控制是否允许Unclean领导者选举，true提高了高可用，降低了数据一致性。推荐设置为false</p>
+<p><a target="_blank" rel="noopener" href="http://kafka.apache.org/documentation/#upgrade_1100_notable">0.11.0</a>以后的版本默认都是false,从<a target="_blank" rel="noopener" href="http://kafka.apache.org/documentation/#upgrade_210_notable">2.1.0版本</a>开始复写动态配置的话，默认为启用</p>
+<h2 id="Kafka请求是怎么被处理"><a href="#Kafka请求是怎么被处理" class="headerlink" title="Kafka请求是怎么被处理"></a>Kafka请求是怎么被处理</h2><p><img src="http://static.trumandu.top/kafka_request.png"></p>
+<p>num.network.threads 决定网络线程池的数量，默认值为3</p>
+<p>num.io.threads 控制IO线程池的数量，默认值为8</p>
+<h2 id="Kafka-JMX指标监控"><a href="#Kafka-JMX指标监控" class="headerlink" title="Kafka JMX指标监控"></a>Kafka JMX指标监控</h2><ul>
+<li>BytesIn/BytesOut：即Broker端每秒⼊站和出站字节数。你要确保这组值不要接近你的⽹络带宽，否则这通常都表示⽹卡已 被“打满”，很容易出现⽹络丢包的情形。 </li>
+<li>NetworkProcessorAvgIdlePercent：即⽹络线程池线程平均的空闲⽐例。通常来说，你应该确保这个JMX值⻓期⼤于 30%。如果⼩于这个值，就表明你的⽹络线程池⾮常繁忙，你需要通过增加⽹络线程数或将负载转移给其他服务器的⽅ 式，来给该Broker减负。 </li>
+<li>RequestHandlerAvgIdlePercent：即I/O线程池线程平均的空闲⽐例。同样地，如果该值⻓期⼩于30%，你需要调整I/O线程 池的数量，或者减少Broker端的负载。</li>
+<li>UnderReplicatedPartitions：即未充分备份的分区数。所谓未充分备份，是指并⾮所有的Follower副本都和Leader副本保持 同步。⼀旦出现了这种情况，通常都表明该分区有可能会出现数据丢失。因此，这是⼀个⾮常重要的JMX指标。 </li>
+<li>ISRShrink/ISRExpand：即ISR收缩和扩容的频次指标。如果你的环境中出现ISR中副本频繁进出的情形，那么这组值⼀定 是很⾼的。这时，你要诊断下副本频繁进出ISR的原因，并采取适当的措施。 </li>
+<li>ActiveControllerCount：即当前处于激活状态的控制器的数量。正常情况下，Controller所在Broker上的这个JMX指标值应 该是1，其他Broker上的这个值是0。如果你发现存在多台Broker上该值都是1的情况，⼀定要赶快处理，处理⽅式主要是查 看⽹络连通性。这种情况通常表明集群出现了脑裂。脑裂问题是⾮常严重的分布式故障，Kafka⽬前依托ZooKeeper来防⽌ 脑裂。但⼀旦出现脑裂，Kafka是⽆法保证正常⼯作的。</li>
+</ul>
+<h2 id="Kafka常用Broker动态配置"><a href="#Kafka常用Broker动态配置" class="headerlink" title="Kafka常用Broker动态配置"></a>Kafka常用Broker动态配置</h2><p>以下为常用Broker动态配置，不用重启Broker即可生效</p>
+<ol>
+<li>log.retention.ms。</li>
+<li>num.io.threads和num.network.threads</li>
+<li>与SSL相关的参数（ssl.keystore.type、ssl.keystore.location、ssl.keystore.password和ssl.key.password）。。</li>
+<li>num.replica.fetchers。</li>
+</ol>
+<h2 id="调优Kafka"><a href="#调优Kafka" class="headerlink" title="调优Kafka"></a>调优Kafka</h2><ul>
+<li>保持客户端版本与Kafka broker版本一致，这样能享受Zero Copy</li>
+<li>JVM堆⼤⼩设置成6～8GB(自己推荐6g,具体详见linked数据)</li>
+</ul>
+<h3 id="增大吞吐量"><a href="#增大吞吐量" class="headerlink" title="增大吞吐量"></a>增大吞吐量</h3><p>当需要调整吞吐量的情况时可以考虑如下调整参数：</p>
+<table>
+<thead>
+<tr>
+<th align="left">作用范围</th>
+<th align="left">参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Broker</td>
+<td align="left">1.适当增加数num.replica.fetchers数量，但不要超过CPU数量 2.调整GC参数以避免经常性GC</td>
+</tr>
+<tr>
+<td align="left">Producer</td>
+<td align="left">1.增加消息批次的⼤⼩以及批次缓存时间，即batch.size和linger.ms 2.配置压缩算法，lz4/zstd 3.acks=0或1，4.retries=0 5.如果多个线程共享Producer，适当增大buffer.memory</td>
+</tr>
+<tr>
+<td align="left">Consumer</td>
+<td align="left">增加fetch.min.bytes参数值。默认是1字节</td>
+</tr>
+</tbody></table>
+<h3 id="降低延时"><a href="#降低延时" class="headerlink" title="降低延时"></a>降低延时</h3><p>当需要调整延时的情况时可以考虑如下调整参数：</p>
+<table>
+<thead>
+<tr>
+<th align="center">作用范围</th>
+<th align="center">参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Broker</td>
+<td align="center">增加num.replica.fetchers数量</td>
+</tr>
+<tr>
+<td align="center">Producer</td>
+<td align="center">1.设置linger.ms=0 2.不要启⽤压缩 3.置acks=1</td>
+</tr>
+<tr>
+<td align="center">Consumer</td>
+<td align="center">fetch.min.bytes=1</td>
+</tr>
+</tbody></table>
+<h2 id="消费者组状态及各个状态流转"><a href="#消费者组状态及各个状态流转" class="headerlink" title="消费者组状态及各个状态流转"></a>消费者组状态及各个状态流转</h2><p><img src="http://static.trumandu.top/kafka_group_state.png"></p>
+<p><img src="http://static.trumandu.top/kafka_group_change_status.png"></p>
+<h2 id="⾼⽔位和LEO的更新机制"><a href="#⾼⽔位和LEO的更新机制" class="headerlink" title="⾼⽔位和LEO的更新机制"></a>⾼⽔位和LEO的更新机制</h2><h3 id="高水位作用"><a href="#高水位作用" class="headerlink" title="高水位作用"></a>高水位作用</h3><ol>
+<li>消息可见性</li>
+<li>帮助kafka完成副本同步</li>
+</ol>
+<h3 id="Leader副本"><a href="#Leader副本" class="headerlink" title="Leader副本"></a>Leader副本</h3><p>处理⽣产者请求的逻辑如下：</p>
+<ol>
+<li><p>写⼊消息到本地磁盘。 </p>
+</li>
+<li><p>更新分区⾼⽔位值。<br>i. 获取Leader副本所在Broker端保存的所有远程副本LEO值{LEO-1，LEO-2，……，LEO-n}。<br>ii. 获取Leader副本LEO：leader_leo。<br>iii. 更新currentHW = min((leader_leo, LEO-1，LEO-2，……，LEO-n)。</p>
+</li>
+</ol>
+<p>处理Follower副本拉取消息的逻辑如下：</p>
+<ol>
+<li>读取磁盘（或⻚缓存）中的消息数据。</li>
+<li>使⽤Follower副本发送请求中的位移值更新远程副本LEO值。 </li>
+<li>更新分区⾼⽔位值（具体步骤与处理⽣产者请求的步骤相同）。 </li>
+</ol>
+<h3 id="Follower副本"><a href="#Follower副本" class="headerlink" title="Follower副本"></a>Follower副本</h3><p>从Leader拉取消息的处理逻辑如下： </p>
+<ol>
+<li>写⼊消息到本地磁盘。 </li>
+<li>更新LEO值。 </li>
+<li>更新⾼⽔位值。<br> i. 获取Leader发送的⾼⽔位值：currentHW（leader）。<br> ii. 获取步骤2中更新过的LEO值：currentLEO。<br> iii. 更新⾼⽔位为min(currentHW, currentLEO)。</li>
+</ol>
+<p>文字比较费解，还是看图。原文和我写的有点出入，不过我感觉这样才是正确的！</p>
+<p><img src="http://static.trumandu.top/2020-10-14-kafka_core-hw.png"></p>
+<h2 id="Leader-Epoch"><a href="#Leader-Epoch" class="headerlink" title="Leader Epoch"></a>Leader Epoch</h2><p>⾼⽔位更新错配导致的各种不⼀致问题，因此引入了Leader Epoch</p>
+<p>所谓Leader Epoch，我们⼤致可以认为是Leader版本。它由两部分数据组成。 </p>
+<ol>
+<li>Epoch。⼀个单调增加的版本号。每当副本领导权发⽣变更时，都会增加该版本号。⼩版本号的Leader被认为是过期 Leader，不能再⾏使Leader权⼒。</li>
+<li> 起始位移（Start Offset）。Leader副本在该Epoch值上写⼊的⾸条消息的位移。</li>
+</ol>
+<p>Kafka Broker会在内存中为每个分区都缓存Leader Epoch数据（会持久化,leader-epochcheckpoint⽂件），来避免重启截断日志的情况发生。</p>
+<p><img src="https://img-blog.csdnimg.cn/20190814184301298.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L21hZG9uZ3l1MTI1OTg5MjkzNg==,size_16,color_FFFFFF,t_70"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2020/10/14/%E3%80%8AKafka%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%AE%9E%E6%88%98%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="《Kafka核心技术与实战》学习笔记">http://blog.trumandu.top/2020/10/14/《Kafka核心技术与实战》学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/09/29/Kafka-cluster-%E5%9C%A8%E4%BA%A7%E7%BA%BF%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="prev" title="Kafka cluster 在产线部署最佳实践">
+                  <i class="fa fa-chevron-left"></i> Kafka cluster 在产线部署最佳实践
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/11/25/Java-NIO%E6%89%AB%E7%9B%B2%E7%AF%87/" rel="next" title="Java NIO扫盲篇">
+                  Java NIO扫盲篇 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>

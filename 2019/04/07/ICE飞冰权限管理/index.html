@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="前言前端页面权限在日常开发中，主要有以下：  登录授权，用户没有登录只能访问登录页面，如果处于登录状态则跳转到当前用户的默认首页；  路由授权，当前登录用户的角色，如果对一个 URL 没有权限访问，则跳转到 403 页面；  数据授权，当访问一个没有权限的 API，则跳转到 403 页面；  操作授权，当页面中某个按钮或者区域没有权限访问则在页面中隐藏   本文主要针对ICE飞冰模板，介绍下如何开">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ICE飞冰权限管理">
+<meta property="og:url" content="http://blog.trumandu.top/2019/04/07/ICE%E9%A3%9E%E5%86%B0%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="前言前端页面权限在日常开发中，主要有以下：  登录授权，用户没有登录只能访问登录页面，如果处于登录状态则跳转到当前用户的默认首页；  路由授权，当前登录用户的角色，如果对一个 URL 没有权限访问，则跳转到 403 页面；  数据授权，当访问一个没有权限的 API，则跳转到 403 页面；  操作授权，当页面中某个按钮或者区域没有权限访问则在页面中隐藏   本文主要针对ICE飞冰模板，介绍下如何开">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-04-07T13:14:43.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:24.820Z">
+<meta property="article:author" content="Truman">
+<meta property="article:tag" content="教程">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2019/04/07/ICE%E9%A3%9E%E5%86%B0%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>ICE飞冰权限管理 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5"><span class="nav-number">2.</span> <span class="nav-text">实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E6%8E%88%E6%9D%83"><span class="nav-number">2.1.</span> <span class="nav-text">登录授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E6%8E%88%E6%9D%83"><span class="nav-number">2.2.</span> <span class="nav-text">路由授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8F%9C%E5%8D%95%E6%8E%88%E6%9D%83"><span class="nav-number">2.3.</span> <span class="nav-text">菜单授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%8E%88%E6%9D%83"><span class="nav-number">2.4.</span> <span class="nav-text">操作授权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/04/07/ICE%E9%A3%9E%E5%86%B0%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ICE飞冰权限管理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-07 21:14:43" itemprop="dateCreated datePublished" datetime="2019-04-07T21:14:43+08:00">2019-04-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前端页面权限在日常开发中，主要有以下：</p>
+<ul>
+<li><p>登录授权，用户没有登录只能访问登录页面，如果处于登录状态则跳转到当前用户的默认首页；</p>
+</li>
+<li><p>路由授权，当前登录用户的角色，如果对一个 URL 没有权限访问，则跳转到 403 页面；</p>
+</li>
+<li><p>数据授权，当访问一个没有权限的 API，则跳转到 403 页面；</p>
+</li>
+<li><p>操作授权，当页面中某个按钮或者区域没有权限访问则在页面中隐藏</p>
+</li>
+</ul>
+<p>本文主要针对ICE飞冰模板，介绍下如何开发权限管理，主要是使用，不涉及任何架构设计及原理，关于原理可以参考源码分析，或者参考本文参考链接。</p>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><p>首先先安装依赖，因为飞冰权限是使用<a target="_blank" rel="noopener" href="https://pro.ant.design/components/Authorized-cn/">Authorized</a> 权限组件实现了基本的权限管理方案。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install antd --save</span><br><span class="line">npm install ant-design-pro@latest --save</span><br></pre></td></tr></table></figure>
+<p>因为ant-design-pro依赖antd，因此需要首先安装antd</p>
+<p>在开始之前需要新增两个util,一个设置登录权限，一个为了重新渲染权限</p>
+<p>authority.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; use localStorage to store the authority info, which might be sent from server in actual project.</span><br><span class="line">export function getAuthority() &#123;</span><br><span class="line">  return localStorage.getItem(&#39;ice-pro-authority&#39;) || &#39;admin&#39;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export function setAuthority(authority) &#123;</span><br><span class="line">  return localStorage.setItem(&#39;ice-pro-authority&#39;, authority);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export function removeAuthority() &#123;</span><br><span class="line">  return localStorage.removeItem(&#39;ice-pro-authority&#39;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Authorized.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import RenderAuthorized from &#39;ant-design-pro&#x2F;lib&#x2F;Authorized&#39;;</span><br><span class="line">import &#123; getAuthority &#125; from &#39;.&#x2F;authority&#39;;</span><br><span class="line"></span><br><span class="line">let Authorized &#x3D; RenderAuthorized(getAuthority()); &#x2F;&#x2F; eslint-disable-line</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 更新权限</span><br><span class="line">const reloadAuthorized &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">  Authorized &#x3D; RenderAuthorized(getAuthority());</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">export &#123; reloadAuthorized &#125;;</span><br><span class="line">export default Authorized;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="登录授权"><a href="#登录授权" class="headerlink" title="登录授权"></a>登录授权</h3><p>在登录页面，引入依赖，然后再login方法处设置权限，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import &#123; setAuthority &#125; from &#39;..&#x2F;..&#x2F;utils&#x2F;authority&#39;;</span><br><span class="line">import &#123; reloadAuthorized &#125; from &#39;..&#x2F;..&#x2F;utils&#x2F;Authorized&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 这里设置权限为admin,添加该方法到login验证通过的方法处。</span><br><span class="line">setAuthority(&#39;admin&#39;);</span><br><span class="line">&#x2F;&#x2F;重新渲染页面</span><br><span class="line">reloadAuthorized();</span><br></pre></td></tr></table></figure>
+
+<p>退出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">removeAuthority()</span><br></pre></td></tr></table></figure>
+
+<h3 id="路由授权"><a href="#路由授权" class="headerlink" title="路由授权"></a>路由授权</h3><p>编辑routerConfig.js,在需要设置权限的地方添加authority属性，值可以是string,数组。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  path: &#39;&#x2F;approve&#x2F;tasks&#39;,</span><br><span class="line">  component: ApproveTask,</span><br><span class="line">  authority: &#39;admin&#39;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在MainRoutes.jsx 设置重定向地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">import &#123;AuthorizedRoute&#125; from &#39;ant-design-pro&#x2F;lib&#x2F;Authorized&#39;;</span><br><span class="line">&#x2F;**</span><br><span class="line">   * 根据菜单取得重定向地址.</span><br><span class="line">   *&#x2F;</span><br><span class="line">  getRedirectData &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">    const redirectData &#x3D; [];</span><br><span class="line">    const getRedirect &#x3D; (item) &#x3D;&gt; &#123;</span><br><span class="line">      if (item &amp;&amp; item.children) &#123;</span><br><span class="line">        if (item.children[0] &amp;&amp; item.children[0].path) &#123;</span><br><span class="line">          redirectData.push(&#123;</span><br><span class="line">            from: &#96;$&#123;item.path&#125;&#96;,</span><br><span class="line">            to: &#96;$&#123;item.children[0].path&#125;&#96;,</span><br><span class="line">          &#125;);</span><br><span class="line">          item.children.forEach((children) &#x3D;&gt; &#123;</span><br><span class="line">            getRedirect(children);</span><br><span class="line">          &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    asideMenuConfig.forEach(getRedirect);</span><br><span class="line"></span><br><span class="line">    return redirectData;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  &#x2F;**</span><br><span class="line">   * 渲染权限路由组件</span><br><span class="line">   *&#x2F;</span><br><span class="line">  renderAuthorizedRoute &#x3D; (item, index) &#x3D;&gt; &#123;</span><br><span class="line">    return item.component ? (</span><br><span class="line">      &lt;AuthorizedRoute</span><br><span class="line">        key&#x3D;&#123;index&#125;</span><br><span class="line">        path&#x3D;&#123;item.path&#125;</span><br><span class="line">        component&#x3D;&#123;item.component&#125;</span><br><span class="line">        exact&#x3D;&#123;item.exact&#125;</span><br><span class="line">        authority&#x3D;&#123;item.authority&#125;</span><br><span class="line">        redirectPath&#x3D;&quot;&#x2F;exception&#x2F;403&quot;</span><br><span class="line">      &#x2F;&gt;</span><br><span class="line">    ) : null;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    const redirectData &#x3D; this.getRedirectData();</span><br><span class="line">    return (</span><br><span class="line">      &lt;Switch&gt;</span><br><span class="line">        &#123;&#x2F;* 渲染权限路由表 *&#x2F;&#125;</span><br><span class="line">        </span><br><span class="line">        &#123;routerData.map(this.renderAuthorizedRoute)&#125;</span><br><span class="line">        </span><br><span class="line">        &#123;&#x2F;* 路由重定向，嵌套路由默认重定向到当前菜单的第一个路由 *&#x2F;&#125;</span><br><span class="line">        </span><br><span class="line">        &#123;redirectData.map((item, index) &#x3D;&gt; &#123;</span><br><span class="line">          return &lt;Redirect key&#x3D;&#123;index&#125; exact from&#x3D;&#123;item.from&#125; to&#x3D;&#123;item.to&#125; &#x2F;&gt;;</span><br><span class="line">        &#125;)&#125;</span><br><span class="line"></span><br><span class="line">        &#123;&#x2F;* 根路由默认重定向到 &#x2F;dashboard *&#x2F;&#125;</span><br><span class="line">        &lt;Redirect from&#x3D;&quot;&#x2F;&quot; to&#x3D;&quot;&#x2F;user&#x2F;login&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">        &#123;&#x2F;* 未匹配到的路由重定向到 NotFound *&#x2F;&#125;</span><br><span class="line">        &lt;Route component&#x3D;&#123;NotFound&#125; &#x2F;&gt;</span><br><span class="line">      &lt;&#x2F;Switch&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里跳转到403页面，这里不再说明如何增加403页面</p>
+<h3 id="菜单授权"><a href="#菜单授权" class="headerlink" title="菜单授权"></a>菜单授权</h3><p>修改meConfig.js。在需要添加权限地方，设置角色名称，<code>authority: &#39;admin&#39;</code>,子菜单会继承父菜单的权限。详细案例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">const asideMenuConfig &#x3D; [</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#39;Topics&#39;,</span><br><span class="line">    path: &#39;&#x2F;topics&#39;,</span><br><span class="line">    icon: &#39;home2&#39;,</span><br><span class="line">    children: [</span><br><span class="line">      &#123; name: &#39;Topic List&#39;, path: &#39;&#x2F;topics&#x2F;list&#39;, authority: [&#39;admin&#39;, &#39;member&#39;] &#125;,</span><br><span class="line">      &#123; name: &#39;My Task&#39;, path: &#39;&#x2F;topics&#x2F;task&#39;, authority: [&#39;admin&#39;, &#39;member&#39;] &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#39;Approve&#39;,</span><br><span class="line">    path: &#39;&#x2F;approve&#39;,</span><br><span class="line">    icon: &#39;publish&#39;,</span><br><span class="line">    authority: &#39;admin&#39;,</span><br><span class="line">    children: [</span><br><span class="line">      &#123; name: &#39;Task List&#39;, path: &#39;&#x2F;approve&#x2F;tasks&#39; &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>在<code>\src\layouts\BasicLayout\components\Aside</code>页面添加权限校验：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">import RenderAuthorized from &#39;ant-design-pro&#x2F;lib&#x2F;Authorized&#39;;</span><br><span class="line">import &#123; getAuthority &#125; from &#39;..&#x2F;..&#x2F;..&#x2F;..&#x2F;utils&#x2F;authority&#39;;</span><br><span class="line">import &#123; asideMenuConfig &#125; from &#39;..&#x2F;..&#x2F;..&#x2F;..&#x2F;menuConfig&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;省略部分方法</span><br><span class="line">&#x2F;**</span><br><span class="line">   * 权限检查</span><br><span class="line">   *&#x2F;</span><br><span class="line">  checkPermissionItem &#x3D; (authority, ItemDom) &#x3D;&gt; &#123;</span><br><span class="line">    if (Authorized.check) &#123;</span><br><span class="line">      const &#123; check &#125; &#x3D; Authorized;</span><br><span class="line">      return check(authority, ItemDom);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return ItemDom;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  &#x2F;**</span><br><span class="line">   * 获取菜单项数据</span><br><span class="line">   *&#x2F;</span><br><span class="line">  getNavMenuItems &#x3D; (menusData) &#x3D;&gt; &#123;</span><br><span class="line">    if (!menusData) &#123;</span><br><span class="line">      return [];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return menusData</span><br><span class="line">      .filter(item &#x3D;&gt; item.name &amp;&amp; !item.hideInMenu)</span><br><span class="line">      .map((item, index) &#x3D;&gt; &#123;</span><br><span class="line">        const ItemDom &#x3D; this.getSubMenuOrItem(item, index);</span><br><span class="line">        return this.checkPermissionItem(item.authority, ItemDom);</span><br><span class="line">      &#125;)</span><br><span class="line">      .filter(item &#x3D;&gt; item);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  &#x2F;**</span><br><span class="line">   * 二级导航</span><br><span class="line">   *&#x2F;</span><br><span class="line">  getSubMenuOrItem &#x3D; (item, index) &#x3D;&gt; &#123;</span><br><span class="line">    if (item.children &amp;&amp; item.children.some(child &#x3D;&gt; child.name)) &#123;</span><br><span class="line">      const childrenItems &#x3D; this.getNavMenuItems(item.children);</span><br><span class="line"></span><br><span class="line">      if (childrenItems &amp;&amp; childrenItems.length &gt; 0) &#123;</span><br><span class="line">        return (</span><br><span class="line">          &lt;SubNav</span><br><span class="line">            key&#x3D;&#123;index&#125;</span><br><span class="line">            label&#x3D;&#123;</span><br><span class="line">              &lt;span&gt;</span><br><span class="line">                &#123;item.icon ? (</span><br><span class="line">                  &lt;FoundationSymbol size&#x3D;&quot;small&quot; type&#x3D;&#123;item.icon&#125; &#x2F;&gt;</span><br><span class="line">                        ) : null&#125;</span><br><span class="line">                &lt;span className&#x3D;&quot;ice-menu-collapse-hide&quot;&gt;</span><br><span class="line">                  &#123;item.name&#125;</span><br><span class="line">                &lt;&#x2F;span&gt;</span><br><span class="line">              &lt;&#x2F;span&gt;</span><br><span class="line">                    &#125;</span><br><span class="line">          &gt;</span><br><span class="line">            &#123;childrenItems&#125;</span><br><span class="line">          &lt;&#x2F;SubNav&gt;</span><br><span class="line">        );</span><br><span class="line">      &#125;</span><br><span class="line">      return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    const linkProps &#x3D; &#123;&#125;;</span><br><span class="line">    if (item.newWindow) &#123;</span><br><span class="line">      linkProps.href &#x3D; item.path;</span><br><span class="line">      linkProps.target &#x3D; &#39;_blank&#39;;</span><br><span class="line">    &#125; else if (item.external) &#123;</span><br><span class="line">      linkProps.href &#x3D; item.path;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      linkProps.to &#x3D; item.path;</span><br><span class="line">    &#125;</span><br><span class="line">    return (</span><br><span class="line">      &lt;Item key&#x3D;&#123;item.path&#125;&gt;</span><br><span class="line">        &lt;Link &#123;...linkProps&#125;&gt;</span><br><span class="line">          &lt;span&gt;</span><br><span class="line">            &#123;item.icon ? (</span><br><span class="line">              &lt;FoundationSymbol size&#x3D;&quot;small&quot; type&#x3D;&#123;item.icon&#125; &#x2F;&gt;</span><br><span class="line">            ) : null&#125;</span><br><span class="line">            &lt;span className&#x3D;&quot;ice-menu-collapse-hide&quot;&gt;&#123;item.name&#125;&lt;&#x2F;span&gt;</span><br><span class="line">          &lt;&#x2F;span&gt;</span><br><span class="line">        &lt;&#x2F;Link&gt;</span><br><span class="line">      &lt;&#x2F;Item&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    const &#123; location &#125; &#x3D; this.props;</span><br><span class="line">    const &#123; pathname &#125; &#x3D; location;</span><br><span class="line"></span><br><span class="line">    return (</span><br><span class="line">      &lt;Layout.Aside width&#x3D;&quot;240&quot; theme&#x3D;&quot;light&quot; className&#x3D;&quot;custom-aside&quot;&gt;</span><br><span class="line">        &lt;Nav</span><br><span class="line">          defaultSelectedKeys&#x3D;&#123;[pathname]&#125;</span><br><span class="line">          selectedKeys&#x3D;&#123;[pathname]&#125;</span><br><span class="line">          onOpen&#x3D;&#123;this.onOpenChange&#125;</span><br><span class="line">          openKeys&#x3D;&#123;this.state.openKeys&#125;</span><br><span class="line">          className&#x3D;&quot;custom-menu&quot;</span><br><span class="line">        &gt;</span><br><span class="line">          &#123;this.getNavMenuItems(asideMenuConfig)&#125;</span><br><span class="line">        &lt;&#x2F;Nav&gt;</span><br><span class="line">        &#123;&#x2F;* 侧边菜单项 end *&#x2F;&#125;</span><br><span class="line">      &lt;&#x2F;Layout.Aside&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="操作授权"><a href="#操作授权" class="headerlink" title="操作授权"></a>操作授权</h3><p>这里说的数据操作授权，即根据不同权限在页面显示不同的菜单,这里是实现只有管理员角色才能操作的按钮。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import RenderAuthorized from &#39;ant-design-pro&#x2F;lib&#x2F;Authorized&#39;;</span><br><span class="line">import &#123; getAuthority &#125; from &#39;..&#x2F;..&#x2F;utils&#x2F;authority&#39;;</span><br><span class="line">const Authorized &#x3D; RenderAuthorized(getAuthority());</span><br><span class="line"></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;Authorized authority&#x3D;&quot;admin&quot; noMatch&#x3D;&#123;noMatch&#125;&gt;</span><br><span class="line">      按钮....</span><br><span class="line">    &lt;&#x2F;Authorized&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;,</span><br><span class="line">  mountNode,</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://alibaba.github.io/ice/docs/pro/authority">权限管理</a></li>
+<li><a target="_blank" rel="noopener" href="https://wsonh.com/article/76.html">Ant Design Pro权限(Authorized)管理模块深入解读</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2019/04/07/ICE%E9%A3%9E%E5%86%B0%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/" title="ICE飞冰权限管理">http://blog.trumandu.top/2019/04/07/ICE飞冰权限管理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%95%99%E7%A8%8B/" rel="tag"># 教程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/04/07/React%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/" rel="prev" title="React学习总结">
+                  <i class="fa fa-chevron-left"></i> React学习总结
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/" rel="next" title="如何监控kafka消费Lag情况">
+                  如何监控kafka消费Lag情况 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>

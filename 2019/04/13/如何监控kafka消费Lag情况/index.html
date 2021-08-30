@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="前言为什么会有这个需求？ kafka consumer 消费会存在延迟情况，我们需要查看消息堆积情况，就是所谓的消息Lag。目前是市面上也有相应的监控工具KafkaOffsetMonitor，我们自己也写了一套监控kmanager。但是随着kafka版本的升级，消费方式也发生了很大的变化，因此，我们需要重构一下kafka offset监控。 正文如何计算Lag在计算Lag之前先普及几个基本常识 L">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何监控kafka消费Lag情况">
+<meta property="og:url" content="http://blog.trumandu.top/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="前言为什么会有这个需求？ kafka consumer 消费会存在延迟情况，我们需要查看消息堆积情况，就是所谓的消息Lag。目前是市面上也有相应的监控工具KafkaOffsetMonitor，我们自己也写了一套监控kmanager。但是随着kafka版本的升级，消费方式也发生了很大的变化，因此，我们需要重构一下kafka offset监控。 正文如何计算Lag在计算Lag之前先普及几个基本常识 L">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-04-13T11:35:10.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:25.148Z">
+<meta property="article:author" content="Truman">
+<meta property="article:tag" content="技术分享">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>如何监控kafka消费Lag情况 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97Lag"><span class="nav-number">3.</span> <span class="nav-text">如何计算Lag</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%98%E6%96%B9%E6%9F%A5%E7%9C%8B%E6%96%B9%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">官方查看方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E6%9F%A5%E8%AF%A2%E6%96%B9%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">程序查询方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#broker%E6%B6%88%E8%B4%B9%E6%96%B9%E5%BC%8F-offset-%E8%8E%B7%E5%8F%96"><span class="nav-number">5.1.</span> <span class="nav-text">broker消费方式 offset 获取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">5.1.1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E8%AE%BE%E8%AE%A1"><span class="nav-number">5.1.2.</span> <span class="nav-text">代码设计</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zookeeper%E6%B6%88%E8%B4%B9%E6%96%B9%E5%BC%8F-offset-%E8%8E%B7%E5%8F%96"><span class="nav-number">5.2.</span> <span class="nav-text">zookeeper消费方式 offset 获取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF-1"><span class="nav-number">5.2.1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E8%AE%BE%E8%AE%A1-1"><span class="nav-number">5.2.2.</span> <span class="nav-text">代码设计</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何监控kafka消费Lag情况
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-13 19:35:10" itemprop="dateCreated datePublished" datetime="2019-04-13T19:35:10+08:00">2019-04-13</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>为什么会有这个需求？</p>
+<p>kafka consumer 消费会存在延迟情况，我们需要查看消息堆积情况，就是所谓的消息Lag。目前是市面上也有相应的监控工具<a target="_blank" rel="noopener" href="https://github.com/quantifind/KafkaOffsetMonitor">KafkaOffsetMonitor</a>，我们自己也写了一套监控<a target="_blank" rel="noopener" href="https://github.com/xaecbd/kmanager">kmanager</a>。但是随着kafka版本的升级，消费方式也发生了很大的变化，因此，我们需要重构一下kafka offset监控。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h2 id="如何计算Lag"><a href="#如何计算Lag" class="headerlink" title="如何计算Lag"></a>如何计算Lag</h2><p>在计算Lag之前先普及几个基本常识</p>
+<p><strong>LEO(LogEndOffset):</strong> 这里说的和官网说的LEO有点区别，主要是指堆consumer可见的offset.即HW(High Watermark)</p>
+<p><strong>CURRENT-OFFSET</strong>: consumer消费到的具体位移</p>
+<p>知道以上信息后，可知<code>Lag=LEO-CURRENT-OFFSET</code>。计算出来的值即为消费延迟情况。</p>
+<h2 id="官方查看方式"><a href="#官方查看方式" class="headerlink" title="官方查看方式"></a>官方查看方式</h2><p>这里说的官方查看方式是在官网文档中提到的，使用官方包里提供的<code>bin/kafka-consumer-groups.sh</code></p>
+<p>最新版的工具只能获取到通过<strong>broker</strong>消费的情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ bin&#x2F;kafka-consumer-groups.sh --describe --bootstrap-server 192.168.0.101:8092 --group test</span><br><span class="line">Consumer group &#39;test&#39; has no active members.</span><br><span class="line"></span><br><span class="line">TOPIC              PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID</span><br><span class="line">truman_test_offset 2          1325            2361            1036            -               -               -</span><br><span class="line">truman_test_offset 6          1265            2289            1024            -               -               -</span><br><span class="line">truman_test_offset 4          1245            2243            998             -               -               -</span><br><span class="line">truman_test_offset 9          1310            2307            997             -               -               -</span><br><span class="line">truman_test_offset 1          1259            2257            998             -               -               -</span><br><span class="line">truman_test_offset 8          1410            2438            1028            -               -               -</span><br><span class="line">truman_test_offset 3          1225            2167            942             -               -               -</span><br><span class="line">truman_test_offset 0          1218            2192            974             -               -               -</span><br><span class="line">truman_test_offset 5          1262            2252            990             -               -               -</span><br><span class="line">truman_test_offset 7          1265            2277            1012            -               -               -</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="程序查询方式"><a href="#程序查询方式" class="headerlink" title="程序查询方式"></a>程序查询方式</h2><p>使用程序查询方式，有什么好处，可以实现自己的offset监控,可以无缝接入任何平台系统。</p>
+<p>既然是用程序实现，那么做个更高级的需求，++<strong>根据topic获取不同消费组的消费情况</strong>++。</p>
+<p>先定义两个实体</p>
+<p>TopicConsumerGroupState</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class TopicConsumerGroupState &#123;</span><br><span class="line">	private String groupId;</span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * 消费方式：zk&#x2F;broker 主要指的offset提交到哪里 新版本 broker 旧版本zk</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	private String consumerMethod;</span><br><span class="line">	private List&lt;PartitionAssignmentState&gt; partitionAssignmentStates;</span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * Dead：组内已经没有任何成员的最终状态，组的元数据也已经被coordinator移除了。这种状态响应各种请求都是一个response：</span><br><span class="line">	 * UNKNOWN_MEMBER_ID Empty：组内无成员，但是位移信息还没有过期。这种状态只能响应JoinGroup请求</span><br><span class="line">	 * PreparingRebalance：组准备开启新的rebalance，等待成员加入 AwaitingSync：正在等待leader</span><br><span class="line">	 * consumer将分配方案传给各个成员 Stable：rebalance完成！可以开始消费了~</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	private ConsumerGroupState consumerGroupState;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;省略set和get方法..</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PartitionAssignmentState</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class PartitionAssignmentState &#123;</span><br><span class="line">	private String group; </span><br><span class="line">	private String topic;</span><br><span class="line">	private int partition;</span><br><span class="line">	private long offset;</span><br><span class="line">	private long lag;</span><br><span class="line">	private String consumerId;</span><br><span class="line">	private String host;</span><br><span class="line">	private String clientId;</span><br><span class="line">	private long logEndOffset;</span><br><span class="line">	&#x2F;&#x2F;省略set和get方法..</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="broker消费方式-offset-获取"><a href="#broker消费方式-offset-获取" class="headerlink" title="broker消费方式 offset 获取"></a>broker消费方式 offset 获取</h3><h4 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h4><ol>
+<li>根据topic 获取消费该topic的group</li>
+<li>通过使用KafkaAdminClient的describeConsumerGroups读取broker上指定group和topic的消费情况，可以获取到clientId,CURRENT-OFFSET,patition，host等</li>
+<li>通过consumer获取LogEndOffset（可见offset）</li>
+<li>将2与3处信息合并，计算Lag<h4 id="代码设计"><a href="#代码设计" class="headerlink" title="代码设计"></a>代码设计</h4>引入最新版依赖,使用KafkaAdminClient获取1,2处信息<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.kafka&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;kafka-clients&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.2.0&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure></li>
+<li>步骤1<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public Set&lt;String&gt; listConsumerGroups(String topic)</span><br><span class="line">		throws InterruptedException, ExecutionException, TimeoutException &#123;</span><br><span class="line">	final Set&lt;String&gt; filteredGroups &#x3D; new HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">	Set&lt;String&gt; allGroups &#x3D; this.adminClient.listConsumerGroups().all().get(30, TimeUnit.SECONDS).stream()</span><br><span class="line">			.map(ConsumerGroupListing::groupId).collect(Collectors.toSet());</span><br><span class="line">	allGroups.forEach(groupId -&gt; &#123;</span><br><span class="line">		try &#123;</span><br><span class="line">			adminClient.listConsumerGroupOffsets(groupId).partitionsToOffsetAndMetadata().get().keySet().stream()</span><br><span class="line">					.filter(tp -&gt; tp.topic().equals(topic)).forEach(tp -&gt; filteredGroups.add(groupId));</span><br><span class="line">		&#125; catch (InterruptedException e) &#123;</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125; catch (ExecutionException e) &#123;</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;);</span><br><span class="line">	return filteredGroups;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>步骤2</li>
+</ol>
+<p>使用describeConsumerGroup获取的消费情况，其中包含有members和无members情况。正常订阅消费是可以获取到members，但是通过制定patition消费拿不到members.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line">	 * 根据topic 获取offset,该结果是不同group 组不同patition的当前消费offset</span><br><span class="line">	 * </span><br><span class="line">	 * @param topic</span><br><span class="line">	 * @return Map&lt;String, Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt;&gt;</span><br><span class="line">	 * @throws InterruptedException</span><br><span class="line">	 * @throws ExecutionException</span><br><span class="line">	 * @throws TimeoutException</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	public Map&lt;String, Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt;&gt; listConsumerGroupOffsets(String topic)</span><br><span class="line">			throws InterruptedException, ExecutionException, TimeoutException &#123;</span><br><span class="line">		Set&lt;String&gt; groupIds &#x3D; this.listConsumerGroups(topic);</span><br><span class="line">		Map&lt;String, Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt;&gt; consumerGroupOffsets &#x3D; new HashMap&lt;&gt;();</span><br><span class="line">		groupIds.forEach(groupId -&gt; &#123;</span><br><span class="line">			Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt; consumerPatitionOffsets &#x3D; new HashSet&lt;&gt;();</span><br><span class="line">			try &#123;</span><br><span class="line">				consumerPatitionOffsets &#x3D; this.adminClient.listConsumerGroupOffsets(groupId)</span><br><span class="line">						.partitionsToOffsetAndMetadata().get(30, TimeUnit.SECONDS).entrySet().stream()</span><br><span class="line">						.filter(entry -&gt; topic.equalsIgnoreCase(entry.getKey().topic())).collect(Collectors.toSet());</span><br><span class="line">				;</span><br><span class="line">			&#125; catch (InterruptedException e) &#123;</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125; catch (ExecutionException e) &#123;</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125; catch (TimeoutException e) &#123;</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125;</span><br><span class="line">			consumerGroupOffsets.put(groupId, consumerPatitionOffsets);</span><br><span class="line">		&#125;);</span><br><span class="line">		return consumerGroupOffsets;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * 根据topic 获取topicConsumerGroupStates,其中未包含lag&#x2F;logEndOffset(consumer可见offset)</span><br><span class="line">	 * </span><br><span class="line">	 * @param topic</span><br><span class="line">	 * @return</span><br><span class="line">	 * @throws InterruptedException</span><br><span class="line">	 * @throws ExecutionException</span><br><span class="line">	 * @throws TimeoutException</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	public List&lt;TopicConsumerGroupState&gt; describeConsumerGroups(String topic)</span><br><span class="line">			throws InterruptedException, ExecutionException, TimeoutException &#123;</span><br><span class="line">		final List&lt;TopicConsumerGroupState&gt; topicConsumerGroupStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">		Set&lt;String&gt; groupIds &#x3D; this.listConsumerGroups(topic);</span><br><span class="line">		Map&lt;String, ConsumerGroupDescription&gt; groupDetails &#x3D; this.adminClient.describeConsumerGroups(groupIds).all()</span><br><span class="line">				.get(30, TimeUnit.SECONDS);</span><br><span class="line"></span><br><span class="line">		Map&lt;String, Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt;&gt; consumerPatitionOffsetMap &#x3D; this</span><br><span class="line">				.listConsumerGroupOffsets(topic);</span><br><span class="line"></span><br><span class="line">		groupDetails.entrySet().forEach(entry -&gt; &#123;</span><br><span class="line">			String groupId &#x3D; entry.getKey();</span><br><span class="line">			ConsumerGroupDescription description &#x3D; entry.getValue();</span><br><span class="line"></span><br><span class="line">			TopicConsumerGroupState topicConsumerGroupState &#x3D; new TopicConsumerGroupState();</span><br><span class="line">			topicConsumerGroupState.setGroupId(groupId);</span><br><span class="line">			topicConsumerGroupState.setConsumerMethod(&quot;broker&quot;);</span><br><span class="line">			topicConsumerGroupState.setConsumerGroupState(description.state());</span><br><span class="line">			&#x2F;&#x2F; 获取group下不同patition消费offset信息</span><br><span class="line">			Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt; consumerPatitionOffsets &#x3D; consumerPatitionOffsetMap</span><br><span class="line">					.get(groupId);</span><br><span class="line">			List&lt;PartitionAssignmentState&gt; partitionAssignmentStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">			if (!description.members().isEmpty()) &#123;</span><br><span class="line">				&#x2F;&#x2F; 获取存在consumer(memeber存在的情况)</span><br><span class="line">				partitionAssignmentStates &#x3D; this.withMembers(consumerPatitionOffsets, topic, groupId, description);</span><br><span class="line">			&#125; else &#123;</span><br><span class="line">				&#x2F;&#x2F; 获取不存在consumer</span><br><span class="line">				partitionAssignmentStates &#x3D; this.withNoMembers(consumerPatitionOffsets, topic, groupId);</span><br><span class="line">			&#125;</span><br><span class="line">			topicConsumerGroupState.setPartitionAssignmentStates(partitionAssignmentStates);</span><br><span class="line">			topicConsumerGroupStates.add(topicConsumerGroupState);</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">		return topicConsumerGroupStates;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	private List&lt;PartitionAssignmentState&gt; withMembers(</span><br><span class="line">			Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt; consumerPatitionOffsets, String topic, String groupId,</span><br><span class="line">			ConsumerGroupDescription description) &#123;</span><br><span class="line">		List&lt;PartitionAssignmentState&gt; partitionAssignmentStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">		Map&lt;Integer, Long&gt; consumerPatitionOffsetMap &#x3D; new HashMap&lt;&gt;();</span><br><span class="line">		consumerPatitionOffsets.forEach(entryInfo -&gt; &#123;</span><br><span class="line">			TopicPartition topicPartition &#x3D; entryInfo.getKey();</span><br><span class="line">			OffsetAndMetadata offsetAndMetadata &#x3D; entryInfo.getValue();</span><br><span class="line">			consumerPatitionOffsetMap.put(topicPartition.partition(), offsetAndMetadata.offset());</span><br><span class="line">		&#125;);</span><br><span class="line">		description.members().forEach(memberDescription -&gt; &#123;</span><br><span class="line">			memberDescription.assignment().topicPartitions().forEach(topicPation -&gt; &#123;</span><br><span class="line">				PartitionAssignmentState partitionAssignmentState &#x3D; new PartitionAssignmentState();</span><br><span class="line">				partitionAssignmentState.setPartition(topicPation.partition());</span><br><span class="line">				partitionAssignmentState.setTopic(topic);</span><br><span class="line">				partitionAssignmentState.setClientId(memberDescription.clientId());</span><br><span class="line">				partitionAssignmentState.setGroup(groupId);</span><br><span class="line">				partitionAssignmentState.setConsumerId(memberDescription.consumerId());</span><br><span class="line">				partitionAssignmentState.setHost(memberDescription.host());</span><br><span class="line">				partitionAssignmentState.setOffset(consumerPatitionOffsetMap.get(topicPation.partition()));</span><br><span class="line">				partitionAssignmentStates.add(partitionAssignmentState);</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;);</span><br><span class="line">		return partitionAssignmentStates;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	private List&lt;PartitionAssignmentState&gt; withNoMembers(</span><br><span class="line">			Set&lt;Entry&lt;TopicPartition, OffsetAndMetadata&gt;&gt; consumerPatitionOffsets, String topic, String groupId) &#123;</span><br><span class="line">		List&lt;PartitionAssignmentState&gt; partitionAssignmentStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">		consumerPatitionOffsets.forEach(entryInfo -&gt; &#123;</span><br><span class="line">			TopicPartition topicPartition &#x3D; entryInfo.getKey();</span><br><span class="line">			OffsetAndMetadata offsetAndMetadata &#x3D; entryInfo.getValue();</span><br><span class="line">			PartitionAssignmentState partitionAssignmentState &#x3D; new PartitionAssignmentState();</span><br><span class="line">			partitionAssignmentState.setPartition(topicPartition.partition());</span><br><span class="line">			partitionAssignmentState.setTopic(topic);</span><br><span class="line">			partitionAssignmentState.setGroup(groupId);</span><br><span class="line">			partitionAssignmentState.setOffset(offsetAndMetadata.offset());</span><br><span class="line">			partitionAssignmentStates.add(partitionAssignmentState);</span><br><span class="line">		&#125;);</span><br><span class="line">		return partitionAssignmentStates;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><p>步骤3</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public Map&lt;TopicPartition, Long&gt;  consumerOffset (String gorupName,String topicName) &#123;</span><br><span class="line">	Properties consumerProps &#x3D; new Properties();</span><br><span class="line">	consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;192.168.0.1.101:9092&quot;);</span><br><span class="line">	consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, gorupName);</span><br><span class="line">	consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);</span><br><span class="line">	consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);</span><br><span class="line">	consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,  StringDeserializer.class);</span><br><span class="line">	consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, &quot;earliest&quot;);</span><br><span class="line">	@SuppressWarnings(&quot;resource&quot;)</span><br><span class="line">	KafkaConsumers&lt;String, String&gt;  consumer  &#x3D; new KafkaConsumers&lt;&gt;(consumerProps);</span><br><span class="line">	KafkaConsumer&lt;String, String&gt; kafkaConsumer &#x3D; consumer.subscribe(topicName);</span><br><span class="line">	List&lt;PartitionInfo&gt; patitions &#x3D; kafkaConsumer.partitionsFor(topicName);</span><br><span class="line">	List&lt;TopicPartition&gt;topicPatitions &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">	patitions.forEach(patition-&gt;&#123;</span><br><span class="line">		TopicPartition topicPartition &#x3D; new TopicPartition(topicName,patition.partition());</span><br><span class="line">		topicPatitions.add(topicPartition);</span><br><span class="line">	&#125;);</span><br><span class="line">	Map&lt;TopicPartition, Long&gt; result &#x3D; kafkaConsumer.endOffsets(topicPatitions);</span><br><span class="line">	return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>步骤4</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">private List&lt;TopicConsumerGroupState&gt; getBrokerConsumerOffsets(String clusterID, String topic) &#123;</span><br><span class="line">	List&lt;TopicConsumerGroupState&gt; topicConsumerGroupStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">	try &#123;</span><br><span class="line">		topicConsumerGroupStates &#x3D; this.describeConsumerGroups(topic);</span><br><span class="line">		&#x2F;&#x2F; 填充lag&#x2F;logEndOffset</span><br><span class="line">		topicConsumerGroupStates.forEach(topicConsumerGroupState -&gt; &#123;</span><br><span class="line">			String groupId &#x3D; topicConsumerGroupState.getGroupId();</span><br><span class="line">			List&lt;PartitionAssignmentState&gt; partitionAssignmentStates &#x3D; topicConsumerGroupState</span><br><span class="line">					.getPartitionAssignmentStates();</span><br><span class="line">			Map&lt;TopicPartition, Long&gt; offsetsMap &#x3D; this.consumerOffset(clusterID, groupId, topic);</span><br><span class="line">			for (Entry&lt;TopicPartition, Long&gt; entry : offsetsMap.entrySet()) &#123;</span><br><span class="line">				long logEndOffset &#x3D; entry.getValue();</span><br><span class="line">				for (PartitionAssignmentState partitionAssignmentState : partitionAssignmentStates) &#123;</span><br><span class="line">					if (partitionAssignmentState.getPartition() &#x3D;&#x3D; entry.getKey().partition()) &#123;</span><br><span class="line">						partitionAssignmentState.setLogEndOffset(logEndOffset);</span><br><span class="line">						partitionAssignmentState.setLag(getLag(partitionAssignmentState.getOffset(), logEndOffset));</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125; catch (InterruptedException e) &#123;</span><br><span class="line">		e.printStackTrace();</span><br><span class="line">	&#125; catch (ExecutionException e) &#123;</span><br><span class="line">		e.printStackTrace();</span><br><span class="line">	&#125; catch (TimeoutException e) &#123;</span><br><span class="line">		e.printStackTrace();</span><br><span class="line">	&#125;</span><br><span class="line">	return topicConsumerGroupStates;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="zookeeper消费方式-offset-获取"><a href="#zookeeper消费方式-offset-获取" class="headerlink" title="zookeeper消费方式 offset 获取"></a>zookeeper消费方式 offset 获取</h3><h4 id="实现思路-1"><a href="#实现思路-1" class="headerlink" title="实现思路"></a>实现思路</h4></li>
+<li><p>根据topic 获取消费该topic的group</p>
+</li>
+<li><p>读取zookeeper上指定group和topic的消费情况，可以获取到clientId,CURRENT-OFFSET,patition。</p>
+</li>
+<li><p>通过consumer获取LogEndOffset（可见offset）</p>
+</li>
+<li><p>将2与3处信息合并，计算Lag</p>
+<h4 id="代码设计-1"><a href="#代码设计-1" class="headerlink" title="代码设计"></a>代码设计</h4><p>引入两个依赖,主要是为了读取zookeeper节点上的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;com.101tec&lt;&#x2F;groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;zkclient&lt;&#x2F;artifactId&gt;</span><br><span class="line">	&lt;version&gt;0.11&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.apache.kafka&lt;&#x2F;groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;kafka_2.11&lt;&#x2F;artifactId&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>步骤1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public Set&lt;String&gt; listTopicGroups(String topic) &#123;</span><br><span class="line">		Set&lt;String&gt; groups &#x3D; new HashSet&lt;&gt;();</span><br><span class="line">		List&lt;String&gt; allGroups &#x3D; zkClient.getChildren(&quot;&#x2F;consumers&quot;);</span><br><span class="line">		allGroups.forEach(group -&gt; &#123;</span><br><span class="line">			if (zkClient.exists(&quot;&#x2F;consumers&#x2F;&quot; + group + &quot;&#x2F;offsets&quot;)) &#123;</span><br><span class="line">				Set&lt;String&gt; offsets &#x3D; new HashSet&lt;&gt;(zkClient.getChildren(&quot;&#x2F;consumers&#x2F;&quot; + group + &quot;&#x2F;offsets&quot;));</span><br><span class="line">				if (offsets.contains(topic)) &#123;</span><br><span class="line">					groups.add(group);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line">		return groups;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>步骤2</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">public Map&lt;String, Map&lt;String, String&gt;&gt; getZKConsumerOffsets(String groupId, String topic) &#123;</span><br><span class="line">		Map&lt;String, Map&lt;String, String&gt;&gt; result &#x3D; new HashMap&lt;&gt;();</span><br><span class="line">		String offsetsPath &#x3D; &quot;&#x2F;consumers&#x2F;&quot; + groupId + &quot;&#x2F;offsets&#x2F;&quot; + topic;</span><br><span class="line">		if (zkClient.exists(offsetsPath)) &#123;</span><br><span class="line">			List&lt;String&gt; offsets &#x3D; zkClient.getChildren(offsetsPath);</span><br><span class="line">			offsets.forEach(patition -&gt; &#123;</span><br><span class="line">				try &#123;</span><br><span class="line">					String offset &#x3D; zkClient.readData(offsetsPath + &quot;&#x2F;&quot; + patition, true);</span><br><span class="line">					if (offset !&#x3D; null) &#123;</span><br><span class="line">						Map&lt;String, String&gt; map &#x3D; new HashMap&lt;&gt;();</span><br><span class="line">						map.put(&quot;offset&quot;, offset);</span><br><span class="line">						result.put(patition, map);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125; catch (Exception e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;</span><br><span class="line">		String ownersPath &#x3D; &quot;&#x2F;consumers&#x2F;&quot; + groupId + &quot;&#x2F;owners&#x2F;&quot; + topic;</span><br><span class="line">		if (zkClient.exists(ownersPath)) &#123;</span><br><span class="line">			List&lt;String&gt; owners &#x3D; zkClient.getChildren(ownersPath);</span><br><span class="line">			owners.forEach(patition -&gt; &#123;</span><br><span class="line">				try &#123;</span><br><span class="line">					try &#123;</span><br><span class="line">						String owner &#x3D; zkClient.readData(ownersPath + &quot;&#x2F;&quot; + patition, true);</span><br><span class="line">						if (owner !&#x3D; null) &#123;</span><br><span class="line">							Map&lt;String, String&gt; map &#x3D; result.get(patition);</span><br><span class="line">							map.put(&quot;owner&quot;, owner);</span><br><span class="line">							result.put(patition, map);</span><br><span class="line">						&#125;</span><br><span class="line">					&#125; catch (Exception e) &#123;</span><br><span class="line">						e.printStackTrace();</span><br><span class="line">					&#125;</span><br><span class="line">				&#125; catch (Exception e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		return result;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>步骤3</p>
+</li>
+</ol>
+<p>略<br>4. 步骤4</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">private List&lt;TopicConsumerGroupState&gt; getZKConsumerOffsets(String topic) &#123;</span><br><span class="line">	final List&lt;TopicConsumerGroupState&gt; topicConsumerGroupStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line">	Set&lt;String&gt; zkGroups &#x3D; this.listTopicGroups(topic);</span><br><span class="line">	zkGroups.forEach(group -&gt; &#123;</span><br><span class="line">		Map&lt;String, Map&lt;String, String&gt;&gt; zkConsumerOffsets &#x3D; this.getZKConsumerOffsets(group,</span><br><span class="line">				topic);</span><br><span class="line"></span><br><span class="line">		Map&lt;TopicPartition, Long&gt; offsetsMap &#x3D; this.consumerOffset(group, topic);</span><br><span class="line"></span><br><span class="line">		TopicConsumerGroupState topicConsumerGroupState &#x3D; new TopicConsumerGroupState();</span><br><span class="line">		topicConsumerGroupState.setGroupId(group);</span><br><span class="line">		topicConsumerGroupState.setConsumerMethod(&quot;zk&quot;);</span><br><span class="line"></span><br><span class="line">		List&lt;PartitionAssignmentState&gt; partitionAssignmentStates &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">		Map&lt;String, Long&gt; offsetsTempMap &#x3D; new HashMap&lt;&gt;(offsetsMap.size());</span><br><span class="line">		offsetsMap.forEach((k, v) -&gt; &#123;</span><br><span class="line">			offsetsTempMap.put(k.partition() + &quot;&quot;, v);</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">		zkConsumerOffsets.forEach((patition, topicDesribe) -&gt; &#123;</span><br><span class="line">			Long logEndOffset &#x3D; offsetsTempMap.get(patition);</span><br><span class="line">			String owner &#x3D; topicDesribe.get(&quot;owner&quot;);</span><br><span class="line">			long offset &#x3D; Long.parseLong(topicDesribe.get(&quot;offset&quot;));</span><br><span class="line">			PartitionAssignmentState partitionAssignmentState &#x3D; new PartitionAssignmentState();</span><br><span class="line">			partitionAssignmentState.setClientId(owner);</span><br><span class="line">			partitionAssignmentState.setGroup(group);</span><br><span class="line">			partitionAssignmentState.setLogEndOffset(logEndOffset);</span><br><span class="line">			partitionAssignmentState.setTopic(topic);</span><br><span class="line">			partitionAssignmentState.setOffset(offset);</span><br><span class="line">			partitionAssignmentState.setPartition(Integer.parseInt(patition));</span><br><span class="line">			partitionAssignmentState.setLag(getLag(offset, logEndOffset));</span><br><span class="line"></span><br><span class="line">			partitionAssignmentStates.add(partitionAssignmentState);</span><br><span class="line">		&#125;);</span><br><span class="line">		topicConsumerGroupState.setPartitionAssignmentStates(partitionAssignmentStates);</span><br><span class="line">		topicConsumerGroupStates.add(topicConsumerGroupState);</span><br><span class="line">	&#125;);</span><br><span class="line">	return topicConsumerGroupStates;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013256816/article/details/79968647">如何获取Kafka的消费者详情——从Scala到Java的切换</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013256816/article/details/79955578">Kafka的Lag计算误区及正确实现</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2019/04/13/%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7kafka%E6%B6%88%E8%B4%B9Lag%E6%83%85%E5%86%B5/" title="如何监控kafka消费Lag情况">http://blog.trumandu.top/2019/04/13/如何监控kafka消费Lag情况/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" rel="tag"># 技术分享</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/04/07/ICE%E9%A3%9E%E5%86%B0%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/" rel="prev" title="ICE飞冰权限管理">
+                  <i class="fa fa-chevron-left"></i> ICE飞冰权限管理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/04/13/Kafka%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%8E%E7%AD%94%E6%A1%88%E5%85%A8%E5%A5%97%E6%95%B4%E7%90%86/" rel="next" title="Kafka面试题与答案全套整理">
+                  Kafka面试题与答案全套整理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>

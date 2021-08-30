@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.trumandu.top","root":"/","images":"/images","scheme":"Mist","version":"8.2.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="春雷行动-前端技术之CSS必备知识前言这篇文章不是教程，也不是让读者能够学会和掌握CSS,而是我的学习笔记。文章的目的是让我实践，系统的了解一下一些必备知识，仅此而已。 如果你需要这方面的知识详细学习的话，推荐你看参考的链接。内容全部来源于此。 正文五种经典布局1.空间居中1234.parent&amp;#123;            display: grid;            place-it">
+<meta property="og:type" content="article">
+<meta property="og:title" content="春雷行动-前端技术之CSS必备知识">
+<meta property="og:url" content="http://blog.trumandu.top/2021/02/12/%E6%98%A5%E9%9B%B7%E8%A1%8C%E5%8A%A8-%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E4%B9%8BCSS%E5%BF%85%E5%A4%87%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="TrumanDu&#39;s Blog">
+<meta property="og:description" content="春雷行动-前端技术之CSS必备知识前言这篇文章不是教程，也不是让读者能够学会和掌握CSS,而是我的学习笔记。文章的目的是让我实践，系统的了解一下一些必备知识，仅此而已。 如果你需要这方面的知识详细学习的话，推荐你看参考的链接。内容全部来源于此。 正文五种经典布局1.空间居中1234.parent&amp;#123;            display: grid;            place-it">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-12T15:40:15.000Z">
+<meta property="article:modified_time" content="2021-07-05T10:07:25.162Z">
+<meta property="article:author" content="Truman">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://blog.trumandu.top/2021/02/12/%E6%98%A5%E9%9B%B7%E8%A1%8C%E5%8A%A8-%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E4%B9%8BCSS%E5%BF%85%E5%A4%87%E7%9F%A5%E8%AF%86/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>春雷行动-前端技术之CSS必备知识 | TrumanDu's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">TrumanDu's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%A5%E9%9B%B7%E8%A1%8C%E5%8A%A8-%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E4%B9%8BCSS%E5%BF%85%E5%A4%87%E7%9F%A5%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">春雷行动-前端技术之CSS必备知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E7%A7%8D%E7%BB%8F%E5%85%B8%E5%B8%83%E5%B1%80"><span class="nav-number">1.2.1.</span> <span class="nav-text">五种经典布局</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%A9%BA%E9%97%B4%E5%B1%85%E4%B8%AD"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.空间居中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%B9%B6%E5%88%97%E5%BC%8F%E5%B8%83%E5%B1%80"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">2.并列式布局</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E4%B8%A4%E6%A0%8F%E5%BC%8F%E5%B8%83%E5%B1%80"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">3.两栏式布局</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E4%B8%89%E6%98%8E%E6%B2%BB%E5%B8%83%E5%B1%80"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">4.三明治布局</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E5%9C%A3%E6%9D%AF%E5%B8%83%E5%B1%80"><span class="nav-number">1.2.1.5.</span> <span class="nav-text">5.圣杯布局</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSS%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="nav-number">1.2.2.</span> <span class="nav-text">CSS使用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E5%BA%A6100"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">高度100%</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E5%AD%97%E7%9A%84%E6%B0%B4%E5%B9%B3%E5%B1%85%E4%B8%AD"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">文字的水平居中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E7%9A%84%E6%B0%B4%E5%B9%B3%E5%B1%85%E4%B8%AD"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">容器的水平居中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E5%AD%97%E7%9A%84%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">文字的垂直居中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E7%9A%84%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">容器的垂直居中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E6%B0%B4%E5%B9%B3%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD"><span class="nav-number">1.2.2.6.</span> <span class="nav-text">容器水平垂直居中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E5%AE%BD%E5%BA%A6%E7%9A%84%E8%87%AA%E9%80%82%E5%BA%94"><span class="nav-number">1.2.2.7.</span> <span class="nav-text">图片宽度的自适应</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3D%E6%8C%89%E9%92%AE"><span class="nav-number">1.2.2.8.</span> <span class="nav-text">3D按钮</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CSS%E7%9A%84%E4%BC%98%E5%85%88%E6%80%A7"><span class="nav-number">1.2.2.9.</span> <span class="nav-text">CSS的优先性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%81%E6%AD%A2%E6%96%87%E5%AD%97%E8%87%AA%E5%8A%A8%E6%8D%A2%E8%A1%8C"><span class="nav-number">1.2.2.10.</span> <span class="nav-text">禁止文字自动换行</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">1.3.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Truman"
+      src="http://static.trumandu.top/logo.JPG">
+  <p class="site-author-name" itemprop="name">Truman</p>
+  <div class="site-description" itemprop="description">代码改变世界，程序设计人生</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/trumandu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;trumandu" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/u/2549866887?is_all=1" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;2549866887?is_all&#x3D;1" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://trumandu.top/" title="TrumanDu → http:&#x2F;&#x2F;trumandu.top" rel="noopener" target="_blank">TrumanDu</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/trumandu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2021/02/12/%E6%98%A5%E9%9B%B7%E8%A1%8C%E5%8A%A8-%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E4%B9%8BCSS%E5%BF%85%E5%A4%87%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          春雷行动-前端技术之CSS必备知识
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-12 23:40:15" itemprop="dateCreated datePublished" datetime="2021-02-12T23:40:15+08:00">2021-02-12</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="春雷行动-前端技术之CSS必备知识"><a href="#春雷行动-前端技术之CSS必备知识" class="headerlink" title="春雷行动-前端技术之CSS必备知识"></a>春雷行动-前端技术之CSS必备知识</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这篇文章不是教程，也不是让读者能够学会和掌握CSS,而是我的学习笔记。文章的目的是让我实践，系统的了解一下一些必备知识，仅此而已。</p>
+<p>如果你需要这方面的知识详细学习的话，推荐你看参考的链接。内容全部来源于此。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="五种经典布局"><a href="#五种经典布局" class="headerlink" title="五种经典布局"></a>五种经典布局</h3><h4 id="1-空间居中"><a href="#1-空间居中" class="headerlink" title="1.空间居中"></a>1.空间居中</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.parent</span>&#123;</span><br><span class="line">            <span class="attribute">display</span>: grid;</span><br><span class="line">            place-items: center;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>核心代码是<code>place-items</code>属性,那个是它的简写形式<code>place-items: &lt;align-items&gt; &lt;justify-items&gt;;</code> 两者相同的话可以省略。</p>
+<p>左上角 <code>place-items: start;</code></p>
+<p>右下角<code>place-items: end;</code></p>
+<h4 id="2-并列式布局"><a href="#2-并列式布局" class="headerlink" title="2.并列式布局"></a>2.并列式布局</h4><p>并列式布局就是多个项目并列。容器设置成 Flex 布局，内容居中（<code>justify-content</code>）可换行（<code>flex-wrap</code>）</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.container</span>&#123;</span><br><span class="line">            <span class="attribute">display</span>: flex;</span><br><span class="line">            <span class="attribute">justify-content</span>: center;</span><br><span class="line">            <span class="attribute">flex-wrap</span>: wrap;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>项目上面只用一行<code>flex</code></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.col</span>&#123;</span><br><span class="line">       <span class="attribute">flex</span>: <span class="number">1</span> <span class="number">1</span> <span class="number">300px</span>;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>flex</code>属性是<code>flex-grow</code>、<code>flex-shrink</code>、<code>flex-basis</code>这三个属性的简写形式 <code>flex: &lt;flex-grow&gt; &lt;flex-shrink&gt; &lt;flex-basis&gt;;</code></p>
+<ul>
+<li><code>flex-basis</code>：项目的初始宽度。</li>
+<li><code>flex-grow</code>：指定如果有多余宽度，项目是否可以扩大。</li>
+<li><code>flex-shrink</code>：指定如果宽度不足，项目是否可以缩小。</li>
+</ul>
+<p><code>flex: 0 1 300px;</code> 表示项目初始宽度是300，宽度不够的话可以缩小，但是不可以扩大。<code>flex: 1 1 300px;</code>，表示项目始终会占满所有宽度。</p>
+<h4 id="3-两栏式布局"><a href="#3-两栏式布局" class="headerlink" title="3.两栏式布局"></a>3.两栏式布局</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.container&#123;</span><br><span class="line">            display: grid;</span><br><span class="line">            grid-template-columns: minmax(100px,20%) 1fr;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>grid-template-columns</code>指定页面分成两列。第一列的宽度是<code>minmax(150px, 25%)</code>，即最小宽度为<code>150px</code>，最大宽度为总宽度的25%；第二列为<code>1fr</code>，即所有剩余宽度。切记div作为容器，需要项目（div）。</p>
+<h4 id="4-三明治布局"><a href="#4-三明治布局" class="headerlink" title="4.三明治布局"></a>4.三明治布局</h4><p>三明治布局指的是，页面在垂直方向上，分成三部分：页眉、内容区、页脚。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.container&#123;</span><br><span class="line">            display: grid;</span><br><span class="line">            grid-template-rows: auto 1fr auto;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>grid-template-rows是指垂直方向。head和foot都是跟随内容自动变化，中间区域为剩余大小</p>
+<h4 id="5-圣杯布局"><a href="#5-圣杯布局" class="headerlink" title="5.圣杯布局"></a>5.圣杯布局</h4><p>圣杯布局是最常用的布局，所以被比喻为圣杯。它将页面分成五个部分，除了页眉和页脚，内容区分成左边栏、主栏、右边栏。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">          display: grid;</span><br><span class="line">          grid-template: auto 1fr auto&#x2F;auto 1fr auto;</span><br><span class="line">      &#125;</span><br><span class="line">      header&#123;</span><br><span class="line">          grid-column: 1 &#x2F; 4;</span><br><span class="line">      &#125;</span><br><span class="line">      .main&#123;</span><br><span class="line">          grid-column: 2 &#x2F; 3;</span><br><span class="line">      &#125;</span><br><span class="line">      .left&#123;</span><br><span class="line">          grid-column: 1 &#x2F; 2;</span><br><span class="line">      &#125;</span><br><span class="line">      .right&#123;</span><br><span class="line">          grid-column: 3 &#x2F; 4;</span><br><span class="line">      &#125;</span><br><span class="line">      footer&#123;</span><br><span class="line">          grid-column: 1 &#x2F; 4;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>grid-template是<code>grid-template-rows</code>和<code>grid-template-columns</code>的简写，<code>grid-template: &lt;grid-template-rows&gt; / &lt;grid-template-columns&gt;</code></p>
+<p>grid-column是<code>grid-column-start</code>和<code>grid-column-end</code>的简写，<code>grid-column: &lt;start-line&gt; / &lt;end-line&gt;</code>表示垂直第几根线。上面代码的<code>grid-column: 1 / 4</code>代表从第1列到第4列。</p>
+<h3 id="CSS使用技巧"><a href="#CSS使用技巧" class="headerlink" title="CSS使用技巧"></a>CSS使用技巧</h3><h4 id="高度100"><a href="#高度100" class="headerlink" title="高度100%"></a>高度100%</h4><p>有的时候，我们发现高度设置为100%不生效，这个是因为百分比相对于父元素，因为我们将所有的父元素都设置为<code>height:100%</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">    <span class="selector-tag">html</span>,<span class="selector-tag">body</span>&#123;</span></span><br><span class="line"><span class="css">        <span class="attribute">height</span>: <span class="number">100%</span>;</span></span><br><span class="line"><span class="css">        <span class="attribute">margin</span>: <span class="number">0px</span>; </span></span><br><span class="line">    &#125;</span><br><span class="line">    .parent&#123;</span><br><span class="line"><span class="css">        <span class="attribute">background-color</span>: lightskyblue;</span></span><br><span class="line"><span class="css">        <span class="attribute">width</span>: <span class="number">100%</span>;</span></span><br><span class="line"><span class="css">        <span class="attribute">height</span>: <span class="number">100%</span>;</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class&#x3D;&quot;parent&quot;&gt;&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>当然使用<code>100vh</code>就没有上面的问题。</p>
+<h4 id="文字的水平居中"><a href="#文字的水平居中" class="headerlink" title="文字的水平居中"></a><strong>文字的水平居中</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text-align:center;</span><br></pre></td></tr></table></figure>
+
+<h4 id="容器的水平居中"><a href="#容器的水平居中" class="headerlink" title="容器的水平居中"></a><strong>容器的水平居中</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">div#container &#123;</span><br><span class="line">　　　　width:760px;</span><br><span class="line">　　　　margin:0 auto;</span><br><span class="line">　　&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先为该容器设置一个明确宽度，然后将margin的水平值设为auto即可。</p>
+<h4 id="文字的垂直居中"><a href="#文字的垂直居中" class="headerlink" title="文字的垂直居中"></a><strong>文字的垂直居中</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">height: 35px; line-height: 35px;</span><br></pre></td></tr></table></figure>
+
+<p>如果有n行文字，那么将行高设为容器高度的n分之一即可。</p>
+<h4 id="容器的垂直居中"><a href="#容器的垂直居中" class="headerlink" title="容器的垂直居中"></a><strong>容器的垂直居中</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id&#x3D;&quot;big&quot;&gt;</span><br><span class="line">　　　　&lt;div id&#x3D;&quot;small&quot;&gt;</span><br><span class="line">　　　　&lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line"></span><br><span class="line">div#big&#123;</span><br><span class="line">　　　　position:relative;</span><br><span class="line">　　　　height:480px;</span><br><span class="line">　　&#125;</span><br><span class="line">　div#small &#123;</span><br><span class="line">　　　　position: absolute;</span><br><span class="line">　　　　top: 50%;</span><br><span class="line">　　　　height: 240px;</span><br><span class="line">　　　　margin-top: -120px;</span><br><span class="line">　　&#125;　</span><br></pre></td></tr></table></figure>
+
+<p>将大容器的定位为relative。将小容器定位为absolute，再将它的左上角沿y轴下移50%，最后将它margin-top上移本身高度的50%即可。</p>
+<h4 id="容器水平垂直居中"><a href="#容器水平垂直居中" class="headerlink" title="容器水平垂直居中"></a>容器水平垂直居中</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">.container&#123;</span><br><span class="line">            position: relative; </span><br><span class="line">            background-color: yellow;</span><br><span class="line">            height: 100vh;</span><br><span class="line">            width: 100vw;</span><br><span class="line">        &#125;</span><br><span class="line">        .col&#123;</span><br><span class="line">            background-color: red;</span><br><span class="line">            position:absolute;</span><br><span class="line">            top:50%;</span><br><span class="line">            left: 50%;</span><br><span class="line">            height: 200px;</span><br><span class="line">            width: 200px;</span><br><span class="line">            margin: -100px 0 0 -100px;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>margin: top right bottom left</p>
+<h4 id="图片宽度的自适应"><a href="#图片宽度的自适应" class="headerlink" title="图片宽度的自适应"></a><strong>图片宽度的自适应</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img &#123;max-width: 100%&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3D按钮"><a href="#3D按钮" class="headerlink" title="3D按钮"></a><strong>3D按钮</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">div#button &#123;</span><br><span class="line">　　　　background: #888;</span><br><span class="line">　　　　border: 1px solid;</span><br><span class="line">　　　　border-color: #999 #777 #777 #999;</span><br><span class="line">　　&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="CSS的优先性"><a href="#CSS的优先性" class="headerlink" title="CSS的优先性"></a><strong>CSS的优先性</strong></h4><p>行内样式 &gt; id样式 &gt; class样式 &gt; 标签名样式</p>
+<h4 id="禁止文字自动换行"><a href="#禁止文字自动换行" class="headerlink" title="禁止文字自动换行"></a><strong>禁止文字自动换行</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">white-space:nowrap;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><p><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2010/03/css_cookbook.html">CSS使用技巧</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/11/css-position.html">CSS 定位详解</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2020/08/five-css-layouts-in-one-line.html">只要一行代码，实现五种 CSS 经典布局</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/03/grid-layout-tutorial.html">CSS Grid 网格布局教程</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html">Flex 布局教程：语法篇</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ghq120/p/10939835.html">CSS实现居中的方式</a></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Truman 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Truman
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.trumandu.top/2021/02/12/%E6%98%A5%E9%9B%B7%E8%A1%8C%E5%8A%A8-%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E4%B9%8BCSS%E5%BF%85%E5%A4%87%E7%9F%A5%E8%AF%86/" title="春雷行动-前端技术之CSS必备知识">http://blog.trumandu.top/2021/02/12/春雷行动-前端技术之CSS必备知识/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/images/wechat-qcode.jpg">
+          <span class="icon">
+            <i class="fab fa-weixin"></i>
+          </span>
+
+          <span class="label">WeChat</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/02/04/Newegg%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83%E4%B9%8BEvent-Hub/" rel="prev" title="Newegg的事件中心之Event Hub">
+                  <i class="fa fa-chevron-left"></i> Newegg的事件中心之Event Hub
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/02/25/Elasticsearch%E9%80%9F%E8%A7%88%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="Elasticsearch速览学习笔记">
+                  Elasticsearch速览学习笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备15011078号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Truman</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+<script>
+NexT.utils.loadComments('.utterances-container', () => {
+  const script = document.createElement('script');
+  script.src = 'https://utteranc.es/client.js';
+  script.setAttribute('repo', "TrumanDu/comments");
+  script.setAttribute('issue-term', "pathname");
+  script.setAttribute('theme', "github-light");
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  document.querySelector('.utterances-container').appendChild(script);
+});
+</script>
+
+</body>
+</html>
