@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,104 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2016/10/24/Eclipse-Maven-Update-%E6%97%B6JDK%E7%89%88%E6%9C%AC%E5%8F%98%E6%9B%B4%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2016/10/24/Eclipse-Maven-Update-%E6%97%B6JDK%E7%89%88%E6%9C%AC%E5%8F%98%E6%9B%B4%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">Eclipse Maven Update 时JDK版本变更问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-10-24 21:21:38" itemprop="dateCreated datePublished" datetime="2016-10-24T21:21:38+08:00">2016-10-24</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>1.新建一个Maven项目JDK版本和系统版本不对应，</p>
+<p>2.右键Maven项目-&gt;Maven-&gt;Update ProjectJDK版本改变了，</p>
+<p>3.操作系统的JDK重装了新的版本，这是引起前面两个现象的主要原因。</p>
+<p>修改方法（假如系统jdk版本是1.8）：</p>
+<p>方法一：在pom.xml文件中指定jdk的版本:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;  </span><br><span class="line">        &lt;plugins&gt;  </span><br><span class="line">            &lt;plugin&gt;  </span><br><span class="line">                &lt;groupId&gt;org.apache.maven.plugins&lt;&#x2F;groupId&gt;  </span><br><span class="line">                &lt;artifactId&gt;maven-compiler-plugin&lt;&#x2F;artifactId&gt;  </span><br><span class="line">                &lt;version&gt;3.1&lt;&#x2F;version&gt;  </span><br><span class="line">                &lt;configuration&gt;  </span><br><span class="line">                    &lt;source&gt;1.8&lt;&#x2F;source&gt;  </span><br><span class="line">                    &lt;target&gt;1.8&lt;&#x2F;target&gt;  </span><br><span class="line">                &lt;&#x2F;configuration&gt;  </span><br><span class="line">            &lt;&#x2F;plugin&gt;  </span><br><span class="line">        &lt;&#x2F;plugins&gt;  </span><br><span class="line">    &lt;&#x2F;build&gt;</span><br><span class="line">&#96;&#96;&#96;    </span><br><span class="line">方法二：修改settings.xml，找到profiles节点，在里面添加</span><br></pre></td></tr></table></figure>
+<profile>    
+    <id>jdk-1.8</id>    
+     <activation>    
+          <activeByDefault>true</activeByDefault>    
+          <jdk>1.8</jdk>    
+      </activation>    
+<properties>    
+<maven.compiler.source>1.8</maven.compiler.source>    
+<maven.compiler.target>1.8</maven.compiler.target>    
+<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>    
+</properties>    
+</profile> 
+```
+然后在update项目就可以保持和系统jdk版本一致。推荐使用第二种方法，减少对每个项目配置。
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1066,98 +1164,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2016/08/21/Java-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2016/08/21/%E5%88%A9%E7%94%A8%E5%A4%96%E9%83%A8%E8%A1%A8%E8%AF%BB%E5%8F%96orc%E6%96%87%E4%BB%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2016/08/21/%E5%88%A9%E7%94%A8%E5%A4%96%E9%83%A8%E8%A1%A8%E8%AF%BB%E5%8F%96orc%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">利用外部表读取orc文件</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2016-08-21 20:45:56" itemprop="dateCreated datePublished" datetime="2016-08-21T20:45:56+08:00">2016-08-21</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/hive/" itemprop="url" rel="index"><span itemprop="name">hive</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="利用外部表读取orc文件"><a href="#利用外部表读取orc文件" class="headerlink" title="利用外部表读取orc文件"></a>利用外部表读取orc文件</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因为orc文件压缩，并且可以快速加载到hive中，因为这种应用于hadoop平台的上文件获得许多开发者的注意。</p>
-<p>ORC : Optimized Row Columnar (ORC) file<br>据官方文档介绍，这种文件格式可以提供一种高效的方法来存储Hive数据。它的设计目标是来克服Hive其他格式的缺陷。运用ORC File可以提高Hive的读、写以及处理数据的性能。 </p>
-<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>可以利用构建hive中外部表来读取orc文件。</p>
-<h3 id="1-建表"><a href="#1-建表" class="headerlink" title="1.建表"></a>1.建表</h3><p>其中location即为orc文件所在的目录，该目录下新增的文件，都可以被hive查出</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CREATE EXTERNAL TABLE test_orc_v2(</span><br><span class="line">status string,</span><br><span class="line">type string</span><br><span class="line">)</span><br><span class="line">stored as orc location &quot;&#x2F;user&#x2F;test&quot;;</span><br></pre></td></tr></table></figure>
-<h3 id="2-orc文件生成"><a href="#2-orc文件生成" class="headerlink" title="2.orc文件生成"></a>2.orc文件生成</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/08/21/%E5%88%A9%E7%94%A8%E5%A4%96%E9%83%A8%E8%A1%A8%E8%AF%BB%E5%8F%96orc%E6%96%87%E4%BB%B6/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

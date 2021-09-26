@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,119 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/12/17/Newegg-Kafka-%E5%B9%B3%E5%8F%B0%E5%8C%96%E7%9A%84%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/12/17/Newegg-Kafka-%E5%B9%B3%E5%8F%B0%E5%8C%96%E7%9A%84%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/" class="post-title-link" itemprop="url">Newegg Kafka 平台化的一点经验</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-12-17 08:59:39" itemprop="dateCreated datePublished" datetime="2019-12-17T08:59:39+08:00">2019-12-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Newegg-Kafka-平台化的一点经验"><a href="#Newegg-Kafka-平台化的一点经验" class="headerlink" title="Newegg Kafka 平台化的一点经验"></a>Newegg Kafka 平台化的一点经验</h1><p>本文基于IT技术圈（西安）10月份线下沙龙整理而来，略有删减。</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/3c62fbd3-9d8b-4f39-b431-3c0b1db04794.png" alt="扫码关注我"></p>
+<h2 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h2><ul>
+<li>Newegg Kafka 使用规模</li>
+<li>Newegg Kafka 使用场景</li>
+<li>Newegg Kafka 平台化KafkaCenter</li>
+<li>KafkaCenter 解决了什么问题</li>
+<li>KafkaCenter 惊鸿一瞥</li>
+<li>KafkaCenter 技术上的探索</li>
+</ul>
+<h2 id="2-Newegg-Kafka-使用规模"><a href="#2-Newegg-Kafka-使用规模" class="headerlink" title="2. Newegg Kafka 使用规模"></a>2. Newegg Kafka 使用规模</h2><p>我们是一家小公司，对Kafka的使用有限，这里我就放出我们系统的一个统计吧，数据截止到2019-10-30，仅统计目前已经接入Kafka平台管理的<strong>产线环境数据</strong></p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/b512665e-0527-42d0-9808-bc5f782344d2.png"></p>
+<p>每天指标如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">MessagesIn</th>
+<th align="center">BytesIn</th>
+<th align="center">BytesOut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1.9b</td>
+<td align="center">2.26TB</td>
+<td align="center">12.23TB</td>
+</tr>
+</tbody></table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/12/17/Newegg-Kafka-%E5%B9%B3%E5%8F%B0%E5%8C%96%E7%9A%84%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1070,106 +1183,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/06/14/kafka-%E6%BA%90%E7%A0%81-idea-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/06/14/kafka-%E6%BA%90%E7%A0%81-idea-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="post-title-link" itemprop="url">kafka 源码 idea 开发环境搭建</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-06-14 21:45:03" itemprop="dateCreated datePublished" datetime="2019-06-14T21:45:03+08:00">2019-06-14</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>为了深入研究kafka运行原理和架构，很有必要搭建开发环境，这样我们就很方便的debug 服务。</p>
-<h2 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h2><ol>
-<li>Gradle 5.0+</li>
-<li>jdk8</li>
-<li>Scala 2.12</li>
-<li><a target="_blank" rel="noopener" href="https://plugins.jetbrains.com/plugin/1347-scala">idea scale plugin</a></li>
-</ol>
-<h2 id="配置-运行"><a href="#配置-运行" class="headerlink" title="配置/运行"></a>配置/运行</h2><ul>
-<li>首先执行在源码目录下执行<code>gradle</code></li>
-<li>然后build <code>./gradlew jar</code></li>
-<li>最后生成idea工程<code>./gradlew idea</code></li>
-</ul>
-<h3 id="运行MirrorMaker"><a href="#运行MirrorMaker" class="headerlink" title="运行MirrorMaker"></a>运行MirrorMaker</h3><p><img src="http://static.trumandu.top/kafka%20%E6%BA%90%E7%A0%81%20idea%20%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA_2.png"></p>
-<h3 id="运行kafka-server"><a href="#运行kafka-server" class="headerlink" title="运行kafka server"></a>运行kafka server</h3><p>因为kafka依赖zookeeper,在开始之前请先启动一个zookeeper服务，本文章略。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/06/14/kafka-%E6%BA%90%E7%A0%81-idea-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

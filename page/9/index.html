@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,93 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2017/03/05/kafka-patition%E8%AE%A1%E7%AE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/03/05/kafka-patition%E8%AE%A1%E7%AE%97/" class="post-title-link" itemprop="url">kafka patition计算</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-03-05 20:50:42" itemprop="dateCreated datePublished" datetime="2017-03-05T20:50:42+08:00">2017-03-05</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="kafka-patition计算"><a href="#kafka-patition计算" class="headerlink" title="kafka patition计算"></a>kafka patition计算</h1><p>kafka生产信息的时候，可以指定该信息存储在具体的patition上，如果不指定会使用默认的算法计算要落的patition.以下是针对此做一个探讨和理解</p>
+<h2 id="消息路由"><a href="#消息路由" class="headerlink" title="消息路由"></a>消息路由</h2><ol>
+<li>指定了 patition，则直接使用；</li>
+<li>未指定 patition 但指定 key，通过对 key 的 value 进行hash 选出一个 patition</li>
+<li>patition 和 key 都未指定，使用轮询选出一个 patition。</li>
+</ol>
+<h2 id="Kafka-Client计算patition"><a href="#Kafka-Client计算patition" class="headerlink" title="Kafka Client计算patition"></a>Kafka Client计算patition</h2><p>详细代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建消息实例</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ProducerRecord</span><span class="params">(String topic, Integer partition, Long timestamp, K key, V value)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (topic == <span class="keyword">null</span>)</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Topic cannot be null&quot;</span>);</span><br><span class="line">     <span class="keyword">if</span> (timestamp != <span class="keyword">null</span> &amp;&amp; timestamp &lt; <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid timestamp &quot;</span> + timestamp);</span><br><span class="line">     <span class="keyword">this</span>.topic = topic;</span><br><span class="line">     <span class="keyword">this</span>.partition = partition;</span><br><span class="line">     <span class="keyword">this</span>.key = key;</span><br><span class="line">     <span class="keyword">this</span>.value = value;</span><br><span class="line">     <span class="keyword">this</span>.timestamp = timestamp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//计算 patition，如果指定了 patition 则直接使用，否则使用 key 计算</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">partition</span><span class="params">(ProducerRecord&lt;K, V&gt; record, <span class="keyword">byte</span>[] serializedKey , <span class="keyword">byte</span>[] serializedValue, Cluster cluster)</span> </span>&#123;</span><br><span class="line">     Integer partition = record.partition();</span><br><span class="line">     <span class="keyword">if</span> (partition != <span class="keyword">null</span>) &#123;</span><br><span class="line">          List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(record.topic());</span><br><span class="line">          <span class="keyword">int</span> lastPartition = partitions.size() - <span class="number">1</span>;</span><br><span class="line">          <span class="keyword">if</span> (partition &lt; <span class="number">0</span> || partition &gt; lastPartition) &#123;</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(String.format(<span class="string">&quot;Invalid partition given with record: %d is not in the range [0...%d].&quot;</span>, partition, lastPartition));</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">return</span> partition;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">this</span>.partitioner.partition(record.topic(), record.key(), serializedKey, record.value(), serializedValue, cluster);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 key 选取 patition</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">partition</span><span class="params">(String topic, Object key, <span class="keyword">byte</span>[] keyBytes, Object value, <span class="keyword">byte</span>[] valueBytes, Cluster cluster)</span> </span>&#123;</span><br><span class="line">     List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(topic);</span><br><span class="line">     <span class="keyword">int</span> numPartitions = partitions.size();</span><br><span class="line">     <span class="keyword">if</span> (keyBytes == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">int</span> nextValue = counter.getAndIncrement();</span><br><span class="line">          List&lt;PartitionInfo&gt; availablePartitions = cluster.availablePartitionsForTopic(topic);</span><br><span class="line">          <span class="keyword">if</span> (availablePartitions.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">               <span class="keyword">int</span> part = DefaultPartitioner.toPositive(nextValue) % availablePartitions.size();</span><br><span class="line">               <span class="keyword">return</span> availablePartitions.get(part).partition();</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> DefaultPartitioner.toPositive(nextValue) % numPartitions;</span><br><span class="line">          &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//对 keyBytes 进行 hash 选出一个 patition</span></span><br><span class="line">          <span class="keyword">return</span> DefaultPartitioner.toPositive(Utils.murmur2(keyBytes)) % numPartitions;</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1075,104 +1162,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
             </div>
           <!--/noindex-->
         
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2016/10/24/Eclipse-Maven-Update-%E6%97%B6JDK%E7%89%88%E6%9C%AC%E5%8F%98%E6%9B%B4%E9%97%AE%E9%A2%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2016/10/24/Eclipse-Maven-Update-%E6%97%B6JDK%E7%89%88%E6%9C%AC%E5%8F%98%E6%9B%B4%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">Eclipse Maven Update 时JDK版本变更问题</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2016-10-24 21:21:38" itemprop="dateCreated datePublished" datetime="2016-10-24T21:21:38+08:00">2016-10-24</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>1.新建一个Maven项目JDK版本和系统版本不对应，</p>
-<p>2.右键Maven项目-&gt;Maven-&gt;Update ProjectJDK版本改变了，</p>
-<p>3.操作系统的JDK重装了新的版本，这是引起前面两个现象的主要原因。</p>
-<p>修改方法（假如系统jdk版本是1.8）：</p>
-<p>方法一：在pom.xml文件中指定jdk的版本:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;  </span><br><span class="line">        &lt;plugins&gt;  </span><br><span class="line">            &lt;plugin&gt;  </span><br><span class="line">                &lt;groupId&gt;org.apache.maven.plugins&lt;&#x2F;groupId&gt;  </span><br><span class="line">                &lt;artifactId&gt;maven-compiler-plugin&lt;&#x2F;artifactId&gt;  </span><br><span class="line">                &lt;version&gt;3.1&lt;&#x2F;version&gt;  </span><br><span class="line">                &lt;configuration&gt;  </span><br><span class="line">                    &lt;source&gt;1.8&lt;&#x2F;source&gt;  </span><br><span class="line">                    &lt;target&gt;1.8&lt;&#x2F;target&gt;  </span><br><span class="line">                &lt;&#x2F;configuration&gt;  </span><br><span class="line">            &lt;&#x2F;plugin&gt;  </span><br><span class="line">        &lt;&#x2F;plugins&gt;  </span><br><span class="line">    &lt;&#x2F;build&gt;</span><br><span class="line">&#96;&#96;&#96;    </span><br><span class="line">方法二：修改settings.xml，找到profiles节点，在里面添加</span><br></pre></td></tr></table></figure>
-<profile>    
-    <id>jdk-1.8</id>    
-     <activation>    
-          <activeByDefault>true</activeByDefault>    
-          <jdk>1.8</jdk>    
-      </activation>    
-<properties>    
-<maven.compiler.source>1.8</maven.compiler.source>    
-<maven.compiler.target>1.8</maven.compiler.target>    
-<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>    
-</properties>    
-</profile> 
-```
-然后在update项目就可以保持和系统jdk版本一致。推荐使用第二种方法，减少对每个项目配置。
       
     </div>
 

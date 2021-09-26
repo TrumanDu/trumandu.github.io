@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,93 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2017/09/17/Kibana%E4%B9%8Bsentinl-slack%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/09/17/Kibana%E4%B9%8Bsentinl-slack%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">Kibana之sentinl slack使用教程</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-09-17 12:26:39" itemprop="dateCreated datePublished" datetime="2017-09-17T12:26:39+08:00">2017-09-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Kibana之sentinl-slack使用教程"><a href="#Kibana之sentinl-slack使用教程" class="headerlink" title="Kibana之sentinl slack使用教程"></a>Kibana之sentinl slack使用教程</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a target="_blank" rel="noopener" href="https://slack.com/">Slack</a>是一个团队协作沟通平台，至于它的强大，就不在这里多说了，sentinl 集成slack,可以将监控告警发送至其中，这个平台支持PC和APP，可以让开发运维人员实时获取监控服务状态。</p>
+<h2 id="申请slack"><a href="#申请slack" class="headerlink" title="申请slack"></a>申请slack</h2><ol>
+<li>注册账户</li>
+<li>点击右上方按钮创建workspace</li>
+<li>新建channel ,进入创建好的workspace，在左侧菜单栏创建，将该chanel设置成public</li>
+<li>集成<a target="_blank" rel="noopener" href="https://my.slack.com/services/new/incoming-webhook">incoming-webhook</a>,获取Webhook URL。详细步骤详见<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/x-pack/current/actions-slack.html#configuring-slack">此处</a><h2 id="kibana配置"><a href="#kibana配置" class="headerlink" title="kibana配置"></a>kibana配置</h2>在kibana.yml配置文件中增加以下内容<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sentinl:</span><br><span class="line">  settings:</span><br><span class="line">     slack:</span><br><span class="line">       active: true</span><br><span class="line">       username: truman</span><br><span class="line">       hook: &#39;https:&#x2F;&#x2F;hooks.slack.com&#x2F;services&#x2F;******&#x2F;*****&#x2F;*****&#39;</span><br><span class="line">       channel: &#39;#messagesend&#39;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+其中hook配置项为Webhook URL<h2 id="sentinl-配置slack-action"><a href="#sentinl-配置slack-action" class="headerlink" title="sentinl 配置slack action"></a>sentinl 配置slack action</h2>在sentinl中增加slack action<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;slack action&quot;: &#123;</span><br><span class="line">        &quot;throttle_period&quot;: &quot;0h0m1s&quot;,</span><br><span class="line">        &quot;slack&quot;: &#123;</span><br><span class="line">          &quot;channel&quot;: &quot;#messagesend&quot;,</span><br><span class="line">          &quot;message&quot;: &quot;payload.hits.total:&#123;&#123;payload.hits.total&#125;&#125;&quot;,</span><br><span class="line">          &quot;stateless&quot;: false</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1112,93 +1199,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
             </div>
           <!--/noindex-->
         
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2017/03/05/kafka-patition%E8%AE%A1%E7%AE%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2017/03/05/kafka-patition%E8%AE%A1%E7%AE%97/" class="post-title-link" itemprop="url">kafka patition计算</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2017-03-05 20:50:42" itemprop="dateCreated datePublished" datetime="2017-03-05T20:50:42+08:00">2017-03-05</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="kafka-patition计算"><a href="#kafka-patition计算" class="headerlink" title="kafka patition计算"></a>kafka patition计算</h1><p>kafka生产信息的时候，可以指定该信息存储在具体的patition上，如果不指定会使用默认的算法计算要落的patition.以下是针对此做一个探讨和理解</p>
-<h2 id="消息路由"><a href="#消息路由" class="headerlink" title="消息路由"></a>消息路由</h2><ol>
-<li>指定了 patition，则直接使用；</li>
-<li>未指定 patition 但指定 key，通过对 key 的 value 进行hash 选出一个 patition</li>
-<li>patition 和 key 都未指定，使用轮询选出一个 patition。</li>
-</ol>
-<h2 id="Kafka-Client计算patition"><a href="#Kafka-Client计算patition" class="headerlink" title="Kafka Client计算patition"></a>Kafka Client计算patition</h2><p>详细代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建消息实例</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ProducerRecord</span><span class="params">(String topic, Integer partition, Long timestamp, K key, V value)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (topic == <span class="keyword">null</span>)</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Topic cannot be null&quot;</span>);</span><br><span class="line">     <span class="keyword">if</span> (timestamp != <span class="keyword">null</span> &amp;&amp; timestamp &lt; <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Invalid timestamp &quot;</span> + timestamp);</span><br><span class="line">     <span class="keyword">this</span>.topic = topic;</span><br><span class="line">     <span class="keyword">this</span>.partition = partition;</span><br><span class="line">     <span class="keyword">this</span>.key = key;</span><br><span class="line">     <span class="keyword">this</span>.value = value;</span><br><span class="line">     <span class="keyword">this</span>.timestamp = timestamp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//计算 patition，如果指定了 patition 则直接使用，否则使用 key 计算</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">partition</span><span class="params">(ProducerRecord&lt;K, V&gt; record, <span class="keyword">byte</span>[] serializedKey , <span class="keyword">byte</span>[] serializedValue, Cluster cluster)</span> </span>&#123;</span><br><span class="line">     Integer partition = record.partition();</span><br><span class="line">     <span class="keyword">if</span> (partition != <span class="keyword">null</span>) &#123;</span><br><span class="line">          List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(record.topic());</span><br><span class="line">          <span class="keyword">int</span> lastPartition = partitions.size() - <span class="number">1</span>;</span><br><span class="line">          <span class="keyword">if</span> (partition &lt; <span class="number">0</span> || partition &gt; lastPartition) &#123;</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(String.format(<span class="string">&quot;Invalid partition given with record: %d is not in the range [0...%d].&quot;</span>, partition, lastPartition));</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">return</span> partition;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">this</span>.partitioner.partition(record.topic(), record.key(), serializedKey, record.value(), serializedValue, cluster);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 key 选取 patition</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">partition</span><span class="params">(String topic, Object key, <span class="keyword">byte</span>[] keyBytes, Object value, <span class="keyword">byte</span>[] valueBytes, Cluster cluster)</span> </span>&#123;</span><br><span class="line">     List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(topic);</span><br><span class="line">     <span class="keyword">int</span> numPartitions = partitions.size();</span><br><span class="line">     <span class="keyword">if</span> (keyBytes == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">int</span> nextValue = counter.getAndIncrement();</span><br><span class="line">          List&lt;PartitionInfo&gt; availablePartitions = cluster.availablePartitionsForTopic(topic);</span><br><span class="line">          <span class="keyword">if</span> (availablePartitions.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">               <span class="keyword">int</span> part = DefaultPartitioner.toPositive(nextValue) % availablePartitions.size();</span><br><span class="line">               <span class="keyword">return</span> availablePartitions.get(part).partition();</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> DefaultPartitioner.toPositive(nextValue) % numPartitions;</span><br><span class="line">          &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//对 keyBytes 进行 hash 选出一个 patition</span></span><br><span class="line">          <span class="keyword">return</span> DefaultPartitioner.toPositive(Utils.murmur2(keyBytes)) % numPartitions;</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
       
     </div>
 

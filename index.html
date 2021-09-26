@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,174 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2021/09/26/MongoDB%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/09/26/MongoDB%E6%8C%87%E5%8D%97/" class="post-title-link" itemprop="url">MongoDB指南</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-09-26 19:54:58 / 修改时间：20:18:06" itemprop="dateCreated datePublished" datetime="2021-09-26T19:54:58+08:00">2021-09-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mongodb/" itemprop="url" rel="index"><span itemprop="name">mongodb</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>MongoDB 是通用、基于文档的分布式数据库。支持完整的 ACID 事务，具有强大的查询语言等。属于NoSQL数据库。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><table>
+<thead>
+<tr>
+<th align="left">SQL术语/概念</th>
+<th align="left">MongoDB术语/概念</th>
+<th align="left">解释/说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">database</td>
+<td align="left">database</td>
+<td align="left">数据库</td>
+</tr>
+<tr>
+<td align="left">table</td>
+<td align="left">collection</td>
+<td align="left">数据库表/集合</td>
+</tr>
+<tr>
+<td align="left">row</td>
+<td align="left">document</td>
+<td align="left">数据记录行/文档</td>
+</tr>
+<tr>
+<td align="left">column</td>
+<td align="left">field</td>
+<td align="left">数据字段/域</td>
+</tr>
+<tr>
+<td align="left">index</td>
+<td align="left">index</td>
+<td align="left">索引</td>
+</tr>
+<tr>
+<td align="left">table joins</td>
+<td align="left"></td>
+<td align="left">表连接,MongoDB不支持</td>
+</tr>
+<tr>
+<td align="left">primary key</td>
+<td align="left">primary key</td>
+<td align="left">主键,MongoDB自动将_id字段设置为主键</td>
+</tr>
+</tbody></table>
+<p>SQL术语/概念MongoDB术语/概念解释/说明databasedatabase数据库tablecollection数据库表/集合rowdocument数据记录行/文档columnfield数据字段/域indexindex索引table joins表连接,MongoDB不支持primary keyprimary key主键,MongoDB自动将_id字段设置为主键SQL术语/概念MongoDB术语/概念解释/说明databasedatabase数据库tablecollection数据库表/集合rowdocument数据记录行/文档columnfield数据字段/域indexindex索引table joins表连接,MongoDB不支持primary keyprimary key主键,MongoDB自动将_id字段设置为主键<img src="http://static.trumandu.top/mongdb%E5%AE%9E%E4%BE%8B%E7%BB%93%E6%9E%84%E5%9B%BE.png"></p>
+<h2 id="适用场景与选型"><a href="#适用场景与选型" class="headerlink" title="适用场景与选型"></a>适用场景与选型</h2><h3 id="MongoDB定位与优点"><a href="#MongoDB定位与优点" class="headerlink" title="MongoDB定位与优点"></a>MongoDB定位与优点</h3><ul>
+<li>OLTP数据库</li>
+<li>ACID事务</li>
+<li><strong>横向扩展能力</strong>,数据量和并发量增加时候架构可以自动扩展</li>
+<li><strong>JSON数据结构</strong> ，适合微服务/REST API</li>
+<li><strong>灵活模型</strong>，适合迭代开发，数据模型多变的场景</li>
+</ul>
+<h3 id="基于功能选择"><a href="#基于功能选择" class="headerlink" title="基于功能选择"></a>基于功能选择</h3><table>
+<thead>
+<tr>
+<th>支持功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>亿及以上数据量</td>
+</tr>
+<tr>
+<td>灵活表结构</td>
+</tr>
+<tr>
+<td>高并发读/写</td>
+</tr>
+<tr>
+<td>跨地区集群</td>
+</tr>
+<tr>
+<td>分片集群</td>
+</tr>
+<tr>
+<td>地理位置查询</td>
+</tr>
+<tr>
+<td>聚合计算</td>
+</tr>
+<tr>
+<td>异构数据</td>
+</tr>
+<tr>
+<td>大宽表</td>
+</tr>
+</tbody></table>
+<p>支持功能亿及以上数据量灵活表结构高并发读/写跨地区集群分片集群地理位置查询聚合计算异构数据大宽表支持功能亿及以上数据量灵活表结构高并发读/写跨地区集群分片集群地理位置查询聚合计算异构数据大宽表### 基于场景选择</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/09/26/MongoDB%E6%8C%87%E5%8D%97/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1068,106 +1236,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/09/29/Kafka-cluster-%E5%9C%A8%E4%BA%A7%E7%BA%BF%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2020/09/23/Nginx-Docker%E6%9E%84%E5%BB%BAhttps%E6%9C%8D%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/09/23/Nginx-Docker%E6%9E%84%E5%BB%BAhttps%E6%9C%8D%E5%8A%A1/" class="post-title-link" itemprop="url">Nginx Docker构建https服务</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-09-23 21:24:29" itemprop="dateCreated datePublished" datetime="2020-09-23T21:24:29+08:00">2020-09-23</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/nginx/" itemprop="url" rel="index"><span itemprop="name">nginx</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇文章介绍生成一个自签名SSL证书以及使用Nginx docker 代理一个https服务。</p>
-<p>SSL证书验证安全连接，有两种验证模式：</p>
-<ol>
-<li>仅客户端验证服务器的证书，客户端自己不提供证书；</li>
-<li>客户端和服务器都互相验证对方的证书。</li>
-</ol>
-<p>显然第二种更安全，一般web采用第一种，比较简单。</p>
-<h2 id="创建自签名证书"><a href="#创建自签名证书" class="headerlink" title="创建自签名证书"></a>创建自签名证书</h2><h3 id="创建步骤"><a href="#创建步骤" class="headerlink" title="创建步骤"></a>创建步骤</h3><ol>
-<li>创建Key；</li>
-<li>创建签名请求；</li>
-<li>将Key的口令移除；</li>
-<li>用Key签名证书。</li>
-</ol>
-<h3 id="创建脚本"><a href="#创建脚本" class="headerlink" title="创建脚本"></a>创建脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;sh</span><br><span class="line"></span><br><span class="line"># create self-signed server certificate:</span><br><span class="line"></span><br><span class="line">read -p &quot;Enter your domain [www.example.com]: &quot; DOMAIN</span><br><span class="line"></span><br><span class="line">echo &quot;Create server key...&quot;</span><br><span class="line"></span><br><span class="line">openssl genrsa -des3 -out $DOMAIN.key 2048</span><br><span class="line"></span><br><span class="line">echo &quot;Create server certificate signing request...&quot;</span><br><span class="line"></span><br><span class="line">SUBJECT&#x3D;&quot;&#x2F;C&#x3D;US&#x2F;ST&#x3D;Mars&#x2F;L&#x3D;iTranswarp&#x2F;O&#x3D;iTranswarp&#x2F;OU&#x3D;iTranswarp&#x2F;CN&#x3D;$DOMAIN&quot;</span><br><span class="line"></span><br><span class="line">openssl req -new -subj $SUBJECT -key $DOMAIN.key -out $DOMAIN.csr</span><br><span class="line"></span><br><span class="line">echo &quot;Remove password...&quot;</span><br><span class="line"></span><br><span class="line">mv $DOMAIN.key $DOMAIN.origin.key</span><br><span class="line">openssl rsa -in $DOMAIN.origin.key -out $DOMAIN.key</span><br><span class="line"></span><br><span class="line">echo &quot;Sign SSL certificate...&quot;</span><br><span class="line"></span><br><span class="line">openssl x509 -req -days 3650 -in $DOMAIN.csr -signkey $DOMAIN.key -out $DOMAIN.crt</span><br><span class="line"></span><br><span class="line">echo &quot;TODO:&quot;</span><br><span class="line">echo &quot;Copy $DOMAIN.crt to &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.crt&quot;</span><br><span class="line">echo &quot;Copy $DOMAIN.key to &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.key&quot;</span><br><span class="line">echo &quot;Add configuration in nginx:&quot;</span><br><span class="line">echo &quot;server &#123;&quot;</span><br><span class="line">echo &quot;    ...&quot;</span><br><span class="line">echo &quot;    listen 443 ssl;&quot;</span><br><span class="line">echo &quot;    ssl_certificate     &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.crt;&quot;</span><br><span class="line">echo &quot;    ssl_certificate_key &#x2F;etc&#x2F;nginx&#x2F;ssl&#x2F;$DOMAIN.key;&quot;</span><br><span class="line">echo &quot;&#125;&quot;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/09/23/Nginx-Docker%E6%9E%84%E5%BB%BAhttps%E6%9C%8D%E5%8A%A1/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

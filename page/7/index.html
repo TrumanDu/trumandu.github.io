@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,102 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2018/07/22/jvm-%E5%9C%A8docker%E4%B8%AD%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/07/22/jvm-%E5%9C%A8docker%E4%B8%AD%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/" class="post-title-link" itemprop="url">jvm 在docker中内存占用问题探索</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-07-22 18:35:47" itemprop="dateCreated datePublished" datetime="2018-07-22T18:35:47+08:00">2018-07-22</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/java/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="jvm-在docker中内存占用问题探索"><a href="#jvm-在docker中内存占用问题探索" class="headerlink" title="jvm 在docker中内存占用问题探索"></a>jvm 在docker中内存占用问题探索</h1><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>最近有个项目在PRD上部署，因为涉及到读取大量数据，会出现内存占用。为了避免因为该项目影响线上其他服务，所以设置了-m=2048，结果发现运行会超过这个值，docker 进程即将该container killed. </p>
+<p>随后设置了好几个级别，直到-m=6048,依然无法避免container 被干掉。但是在本地测试和在同事机器上测试，不会出现内存飙升。同样的数据，同样的容器，唯一不同的就是机器物理配置的不同。</p>
+<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><p>线上机器是128g内存，目前制作的jre image 是1.8版本，未设置堆栈等jvm 配置，那么jvm 会字节分配一个默认堆栈大小，这个大小是根据物理机配置分配的。这样就会造成越高的配置，默认分配（<strong>使用1/4的物理内存</strong>）的堆内存就越大，而docker设置限制内存大小，jvm却无法感知，不知道自己在容器中运行。目前存在该问题的不止jvm,一些linux 命令也是如此，例如：top,free,ps等。</p>
+<p>因此就会出现container 被docker killed情况。这是个惨痛教训。。。</p>
+<h2 id="问题复现"><a href="#问题复现" class="headerlink" title="问题复现"></a>问题复现</h2><p>略…</p>
+<p>有个不错的<a target="_blank" rel="noopener" href="http://www.linux-ren.org/thread/89699.html">文章</a>，可以查看一下。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/07/22/jvm-%E5%9C%A8docker%E4%B8%AD%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1074,93 +1170,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
             </div>
           <!--/noindex-->
         
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2017/09/17/Kibana%E4%B9%8Bsentinl-slack%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2017/09/17/Kibana%E4%B9%8Bsentinl-slack%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">Kibana之sentinl slack使用教程</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2017-09-17 12:26:39" itemprop="dateCreated datePublished" datetime="2017-09-17T12:26:39+08:00">2017-09-17</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Kibana之sentinl-slack使用教程"><a href="#Kibana之sentinl-slack使用教程" class="headerlink" title="Kibana之sentinl slack使用教程"></a>Kibana之sentinl slack使用教程</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a target="_blank" rel="noopener" href="https://slack.com/">Slack</a>是一个团队协作沟通平台，至于它的强大，就不在这里多说了，sentinl 集成slack,可以将监控告警发送至其中，这个平台支持PC和APP，可以让开发运维人员实时获取监控服务状态。</p>
-<h2 id="申请slack"><a href="#申请slack" class="headerlink" title="申请slack"></a>申请slack</h2><ol>
-<li>注册账户</li>
-<li>点击右上方按钮创建workspace</li>
-<li>新建channel ,进入创建好的workspace，在左侧菜单栏创建，将该chanel设置成public</li>
-<li>集成<a target="_blank" rel="noopener" href="https://my.slack.com/services/new/incoming-webhook">incoming-webhook</a>,获取Webhook URL。详细步骤详见<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/x-pack/current/actions-slack.html#configuring-slack">此处</a><h2 id="kibana配置"><a href="#kibana配置" class="headerlink" title="kibana配置"></a>kibana配置</h2>在kibana.yml配置文件中增加以下内容<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sentinl:</span><br><span class="line">  settings:</span><br><span class="line">     slack:</span><br><span class="line">       active: true</span><br><span class="line">       username: truman</span><br><span class="line">       hook: &#39;https:&#x2F;&#x2F;hooks.slack.com&#x2F;services&#x2F;******&#x2F;*****&#x2F;*****&#39;</span><br><span class="line">       channel: &#39;#messagesend&#39;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-其中hook配置项为Webhook URL<h2 id="sentinl-配置slack-action"><a href="#sentinl-配置slack-action" class="headerlink" title="sentinl 配置slack action"></a>sentinl 配置slack action</h2>在sentinl中增加slack action<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&quot;slack action&quot;: &#123;</span><br><span class="line">        &quot;throttle_period&quot;: &quot;0h0m1s&quot;,</span><br><span class="line">        &quot;slack&quot;: &#123;</span><br><span class="line">          &quot;channel&quot;: &quot;#messagesend&quot;,</span><br><span class="line">          &quot;message&quot;: &quot;payload.hits.total:&#123;&#123;payload.hits.total&#125;&#125;&quot;,</span><br><span class="line">          &quot;stateless&quot;: false</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-
       
     </div>
 

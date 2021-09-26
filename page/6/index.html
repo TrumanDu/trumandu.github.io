@@ -177,14 +177,14 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -236,6 +236,98 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2018/10/15/metricbeat-%E6%96%B0%E5%A2%9Ekafka-metrices-%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/10/15/metricbeat-%E6%96%B0%E5%A2%9Ekafka-metrices-%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">metricbeat 新增kafka metrices 教程</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-10-15 17:36:56" itemprop="dateCreated datePublished" datetime="2018-10-15T17:36:56+08:00">2018-10-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="项目背景"><a href="#项目背景" class="headerlink" title="项目背景"></a>项目背景</h1><p>本次教程是编写metrices,开发moduel 基本差不多，可以参考<a href="creating-metricbeat-module">creating-metricbeat-module</a>。</p>
+<p>本次教程是新增kafka metrices ，增加filesize metrices,实现的功能是根据配置的kafka 数据文件目录，获取所有topic，不同patition 数据文件大小，将该数据收集到elasticsearch中，通过kibana 根据不同粒度监控kafka集群。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="beats架构"><a href="#beats架构" class="headerlink" title="beats架构"></a>beats架构</h2><p><img src="https://www.elastic.co/guide/en/beats/devguide/current/images/beat_overview.png" alt="image"></p>
+<h2 id="项目生成"><a href="#项目生成" class="headerlink" title="项目生成"></a>项目生成</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd metricbeat</span><br><span class="line">make create-metricset</span><br></pre></td></tr></table></figure>
+<p>根据提示输入相应的内容，然后生成field.yml文件(make update),编辑metricbeat.yml文件 ，编译然后运行即可。。</p>
+<h2 id="配置写入字段类型及文件"><a href="#配置写入字段类型及文件" class="headerlink" title="配置写入字段类型及文件"></a>配置写入字段类型及文件</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/10/15/metricbeat-%E6%96%B0%E5%A2%9Ekafka-metrices-%E6%95%99%E7%A8%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1227,102 +1319,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2018/07/22/Elasticsearch%E9%9B%86%E7%BE%A4%E5%8E%9F%E7%90%86%E6%8E%A2%E7%B4%A2/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2018/07/22/jvm-%E5%9C%A8docker%E4%B8%AD%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/07/22/jvm-%E5%9C%A8docker%E4%B8%AD%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/" class="post-title-link" itemprop="url">jvm 在docker中内存占用问题探索</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-07-22 18:35:47" itemprop="dateCreated datePublished" datetime="2018-07-22T18:35:47+08:00">2018-07-22</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/java/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="jvm-在docker中内存占用问题探索"><a href="#jvm-在docker中内存占用问题探索" class="headerlink" title="jvm 在docker中内存占用问题探索"></a>jvm 在docker中内存占用问题探索</h1><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>最近有个项目在PRD上部署，因为涉及到读取大量数据，会出现内存占用。为了避免因为该项目影响线上其他服务，所以设置了-m=2048，结果发现运行会超过这个值，docker 进程即将该container killed. </p>
-<p>随后设置了好几个级别，直到-m=6048,依然无法避免container 被干掉。但是在本地测试和在同事机器上测试，不会出现内存飙升。同样的数据，同样的容器，唯一不同的就是机器物理配置的不同。</p>
-<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><p>线上机器是128g内存，目前制作的jre image 是1.8版本，未设置堆栈等jvm 配置，那么jvm 会字节分配一个默认堆栈大小，这个大小是根据物理机配置分配的。这样就会造成越高的配置，默认分配（<strong>使用1/4的物理内存</strong>）的堆内存就越大，而docker设置限制内存大小，jvm却无法感知，不知道自己在容器中运行。目前存在该问题的不止jvm,一些linux 命令也是如此，例如：top,free,ps等。</p>
-<p>因此就会出现container 被docker killed情况。这是个惨痛教训。。。</p>
-<h2 id="问题复现"><a href="#问题复现" class="headerlink" title="问题复现"></a>问题复现</h2><p>略…</p>
-<p>有个不错的<a target="_blank" rel="noopener" href="http://www.linux-ren.org/thread/89699.html">文章</a>，可以查看一下。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/07/22/jvm-%E5%9C%A8docker%E4%B8%AD%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
