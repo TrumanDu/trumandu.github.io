@@ -55,10 +55,13 @@
 var host = "trumandu.github.io";
 if(host == window.location.host){
   var new_url = window.location.href.replace("trumandu.github.io", "blog.trumandu.top");  
+  if(new_url.startsWith("https")){
+    new_url = window.location.href.replace("http", "https");  
+  }
+  
   window.location.replace(new_url); 
 } 
 </script>
-
 
 <title>kafka consumer 源码分析（一）Consumer处理流程 | TrumanDu's Blog</title>
   

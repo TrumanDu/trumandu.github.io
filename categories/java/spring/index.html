@@ -49,10 +49,13 @@
 var host = "trumandu.github.io";
 if(host == window.location.host){
   var new_url = window.location.href.replace("trumandu.github.io", "blog.trumandu.top");  
+  if(new_url.startsWith("https")){
+    new_url = window.location.href.replace("http", "https");  
+  }
+  
   window.location.replace(new_url); 
 } 
 </script>
-
 
 <title>分类: spring | TrumanDu's Blog</title>
   
