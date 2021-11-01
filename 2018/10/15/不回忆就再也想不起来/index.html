@@ -53,12 +53,11 @@
   };
 </script><script>
 var host = "trumandu.github.io";
+if ((host == window.location.host) && (window.location.protocol == "https:"))
+    window.location.protocol = "http";
+    
 if(host == window.location.host){
   var new_url = window.location.href.replace("blog.trumandu.top", "trumandu.github.io");  
-  if(new_url.startsWith("https")){
-    new_url = 'http'+new_url.substring(5,new_url.length);  
-  }
-  
   window.location.replace(new_url); 
 } 
 </script>
