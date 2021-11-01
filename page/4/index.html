@@ -47,8 +47,10 @@
   };
 </script><script>
 var host = "trumandu.github.io";
-if ((host == window.location.host) && (window.location.protocol == "https:"))
-    window.location.protocol = "http";
+if(host == window.location.host){
+  var new_url = window.location.href.replace('blog.trumandu.top', "trumandu.github.io");  
+  window.location.replace(new_url); 
+} 
 </script>
 
 <title>TrumanDu's Blog</title>
@@ -177,20 +179,20 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -236,6 +238,103 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">kafka producer源码分析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-14 21:47:42" itemprop="dateCreated datePublished" datetime="2019-06-14T21:47:42+08:00">2019-06-14</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p> Kafka producer源码分析</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始文章之前，需要解释是一下为什么要研究producer源码。</p>
+<h3 id="为什么要研究producer源码"><a href="#为什么要研究producer源码" class="headerlink" title="为什么要研究producer源码"></a>为什么要研究producer源码</h3><p>通常producer使用都很简单，初始化一个<code>KafkaProducer</code>实例，然后调用<code>send</code>方法就好，但是我们有了解后面是如何发送到kafka集群的吗？其实我们不知道，其次，到底客户端有几个线程？我们不知道。还有producer还能做什么？我们同样不知道。本篇文章就是想回答一下上面提出的几个问题，能力有限，如有错误，欢迎指出！</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>在介绍客户端架构之前，先回答一个问题</p>
+<p>producer到底存在几个线程？<strong>2个</strong>  <strong>Main thread</strong> 和<strong>sender</strong>,其中sender线程负责发送消息，main 线程负责interceptor、序列化、分区等其他操作。</p>
+<p><img src="http://static.trumandu.top/Kafka%20producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-1.jpg"></p>
+<ul>
+<li>Producer首先使用用户主线程将待发送的消息封装进一个ProducerRecord类实例中。</li>
+<li>进行interceptor、序列化、分区等其他操作，发送到Producer程序中RecordAccumulator中。</li>
+<li>Producer的另一个工作线程（即Sender线程），则负责实时地从该缓冲区中提取出准备好的消息封装到一个批次的内，统一发送给对应的broker中。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1124,108 +1223,6 @@ handlePaginationChange也是可以调用的</li>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/04/07/React%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/03/15/KSQL-Tutorials-and-Examples/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/03/15/KSQL-Tutorials-and-Examples/" class="post-title-link" itemprop="url">KSQL Tutorials and Examples</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-03-15 21:47:07" itemprop="dateCreated datePublished" datetime="2019-03-15T21:47:07+08:00">2019-03-15</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/ksql/" itemprop="url" rel="index"><span itemprop="name">ksql</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="1-KSQL是什么？"><a href="#1-KSQL是什么？" class="headerlink" title="1. KSQL是什么？"></a>1. KSQL是什么？</h2><p>KSQL是Apache Kafka的流式SQL引擎，让你可以SQL语方式句执行流处理任务。KSQL降低了数据流处理这个领域的准入门槛，为使用Kafka处理数据提供了一种简单的、完全交互的SQL界面。你不再需要用Java或Python之类的编程语言编写代码了！KSQL具有这些特点：开源（采用Apache 2.0许可证）、分布式、可扩展、可靠、实时。它支持众多功能强大的数据流处理操作，包括<strong>聚合、连接、加窗（windowing）和sessionization</strong>（捕获单一访问者的网站会话时间范围内所有的点击流事件）等等。</p>
-<h2 id="2-KSQL能解决什么问题？"><a href="#2-KSQL能解决什么问题？" class="headerlink" title="2. KSQL能解决什么问题？"></a>2. KSQL能解决什么问题？</h2><ul>
-<li><strong>流式ETL</strong></li>
-</ul>
-<p>Apache Kafka是为数据管道的流行选择。 KSQL使得在管道中转换数据变得简单，准备好消息以便在另一个系统中干净地着陆。 </p>
-<ul>
-<li><strong>实时监控和分析</strong></li>
-</ul>
-<p>通过快速构建实时仪表板，生成指标以及创建自定义警报和消息，跟踪，了解和管理基础架构，应用程序和数据源。 </p>
-<ul>
-<li><strong>数据探索和发现</strong></li>
-</ul>
-<p>在Kafka中导航并浏览您的数据。</p>
-<ul>
-<li><strong>异常检测</strong> </li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/03/15/KSQL-Tutorials-and-Examples/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

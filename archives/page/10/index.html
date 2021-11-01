@@ -47,8 +47,10 @@
   };
 </script><script>
 var host = "trumandu.github.io";
-if ((host == window.location.host) && (window.location.protocol == "https:"))
-    window.location.protocol = "http";
+if(host == window.location.host){
+  var new_url = window.location.href.replace('blog.trumandu.top', "trumandu.github.io");  
+  window.location.replace(new_url); 
+} 
 </script>
 
 <title>归档 | TrumanDu's Blog</title>
@@ -177,20 +179,20 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -245,13 +247,33 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
     <div class="post-content">
       <div class="collection-title">
         
-        <span class="collection-header">很好! 目前共计 125 篇日志。 继续努力。</span>
+        <span class="collection-header">很好! 目前共计 126 篇日志。 继续努力。</span>
       </div>
 
       
     <div class="collection-year">
       <span class="collection-header">2016</span>
     </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2016-10-24T21:23:14+08:00"
+              content="2016-10-24">
+          10-24
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2016/10/24/logstash%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/" itemprop="url">
+            <span itemprop="name">logstash插件开发</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
 
   <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
@@ -426,26 +448,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="post-title">
           <a class="post-title-link" href="/2016/08/28/Redis-Cluster%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BF%AE%E5%A4%8D%E6%80%BB%E7%BB%93/" itemprop="url">
             <span itemprop="name">Redis Cluster慢查询修复总结</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2016-08-21T20:46:59+08:00"
-              content="2016-08-21">
-          08-21
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2016/08/21/Java-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F/" itemprop="url">
-            <span itemprop="name">Java 多线程实现方式</span>
           </a>
       </div>
 

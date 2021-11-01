@@ -47,8 +47,10 @@
   };
 </script><script>
 var host = "trumandu.github.io";
-if ((host == window.location.host) && (window.location.protocol == "https:"))
-    window.location.protocol = "http";
+if(host == window.location.host){
+  var new_url = window.location.href.replace('blog.trumandu.top', "trumandu.github.io");  
+  window.location.replace(new_url); 
+} 
 </script>
 
 <title>TrumanDu's Blog</title>
@@ -177,20 +179,20 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -236,6 +238,108 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/03/15/KSQL-Tutorials-and-Examples/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/15/KSQL-Tutorials-and-Examples/" class="post-title-link" itemprop="url">KSQL Tutorials and Examples</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-15 21:47:07" itemprop="dateCreated datePublished" datetime="2019-03-15T21:47:07+08:00">2019-03-15</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ksql/" itemprop="url" rel="index"><span itemprop="name">ksql</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="1-KSQL是什么？"><a href="#1-KSQL是什么？" class="headerlink" title="1. KSQL是什么？"></a>1. KSQL是什么？</h2><p>KSQL是Apache Kafka的流式SQL引擎，让你可以SQL语方式句执行流处理任务。KSQL降低了数据流处理这个领域的准入门槛，为使用Kafka处理数据提供了一种简单的、完全交互的SQL界面。你不再需要用Java或Python之类的编程语言编写代码了！KSQL具有这些特点：开源（采用Apache 2.0许可证）、分布式、可扩展、可靠、实时。它支持众多功能强大的数据流处理操作，包括<strong>聚合、连接、加窗（windowing）和sessionization</strong>（捕获单一访问者的网站会话时间范围内所有的点击流事件）等等。</p>
+<h2 id="2-KSQL能解决什么问题？"><a href="#2-KSQL能解决什么问题？" class="headerlink" title="2. KSQL能解决什么问题？"></a>2. KSQL能解决什么问题？</h2><ul>
+<li><strong>流式ETL</strong></li>
+</ul>
+<p>Apache Kafka是为数据管道的流行选择。 KSQL使得在管道中转换数据变得简单，准备好消息以便在另一个系统中干净地着陆。 </p>
+<ul>
+<li><strong>实时监控和分析</strong></li>
+</ul>
+<p>通过快速构建实时仪表板，生成指标以及创建自定义警报和消息，跟踪，了解和管理基础架构，应用程序和数据源。 </p>
+<ul>
+<li><strong>数据探索和发现</strong></li>
+</ul>
+<p>在Kafka中导航并浏览您的数据。</p>
+<ul>
+<li><strong>异常检测</strong> </li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/03/15/KSQL-Tutorials-and-Examples/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1038,92 +1142,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 <p>世间巧合万万个，最后一节课依然是那个教室，这大概就是所谓的缘分。回忆是件可怕的事，不想倒是没什么，一想瞬间千万片段释放，不知道是不是触电。物是人非，我离它直线距离不过5公里，可这么多年都未曾再去过，再也见不到熟悉的面孔，再也不能坐在教室里安奈躁动的心。</p>
 <p>毕业的时候忙忙碌碌的，没有参加过毕业典礼，多么想再去补考，再参加一次毕业典礼。</p>
 <p>毕业的时候来不及说再见的人有很多</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2018/10/15/React%E9%97%AE%E9%A2%98%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/10/15/React%E9%97%AE%E9%A2%98%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">React问题笔记</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-10-15 17:46:16" itemprop="dateCreated datePublished" datetime="2018-10-15T17:46:16+08:00">2018-10-15</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/React/" itemprop="url" rel="index"><span itemprop="name">React</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="1-this-作用域处理方案"><a href="#1-this-作用域处理方案" class="headerlink" title="1.this 作用域处理方案"></a>1.this 作用域处理方案</h2><p>问题背景：手动触发事件，更改state中数据</p>
-<ol>
-<li>箭头表达式<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mergeFilter(_this) &#123;</span><br><span class="line">  let store &#x3D; [];</span><br><span class="line">  if (!_this.state.merge) &#123;</span><br><span class="line">    store &#x3D; _this.mergetIndexName(this.state.indices, &#x2F;[^a-z]+$&#x2F;);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    store &#x3D; _this.reBuildOriginData(this.state.indices);</span><br><span class="line">  &#125;</span><br><span class="line">  _this.setState(&#123;</span><br><span class="line">    store: store,</span><br><span class="line">    merge: !_this.state.merge,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
-render组件中调用  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;EuiSwitch</span><br><span class="line">        label&#x3D;&quot;Merge&quot;</span><br><span class="line">        key&#x3D;&quot;MergeEuiSwitch&quot;</span><br><span class="line">        checked&#x3D;&#123;</span><br><span class="line">          this.state.merge</span><br><span class="line">        &#125;</span><br><span class="line">        onChange&#x3D;&#123;()&#x3D;&gt;this.mergeFilter(this)&#125;</span><br><span class="line">&#x2F;&gt;  </span><br></pre></td></tr></table></figure></li>
-<li>bind<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> constructor(props) &#123;</span><br><span class="line">   super(props);</span><br><span class="line">   this.state &#x3D; &#123;value: &#39;coconut&#39;&#125;;</span><br><span class="line"></span><br><span class="line">   this.handleChange &#x3D; this.handleChange.bind(this);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> handleChange(event) &#123;</span><br><span class="line">   this.setState(&#123;value: event.target.value&#125;);</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">render() &#123;</span><br><span class="line">   return (</span><br><span class="line">     &lt;form onSubmit&#x3D;&#123;this.handleSubmit&#125;&gt;</span><br><span class="line">       &lt;label&gt;</span><br><span class="line">         Pick your favorite flavor:</span><br><span class="line">         &lt;select value&#x3D;&#123;this.state.value&#125; onChange&#x3D;&#123;this.handleChange&#125;&gt;</span><br><span class="line">           &lt;option value&#x3D;&quot;grapefruit&quot;&gt;Grapefruit&lt;&#x2F;option&gt;</span><br><span class="line">           &lt;option value&#x3D;&quot;lime&quot;&gt;Lime&lt;&#x2F;option&gt;</span><br><span class="line">           &lt;option value&#x3D;&quot;coconut&quot;&gt;Coconut&lt;&#x2F;option&gt;</span><br><span class="line">           &lt;option value&#x3D;&quot;mango&quot;&gt;Mango&lt;&#x2F;option&gt;</span><br><span class="line">         &lt;&#x2F;select&gt;</span><br><span class="line">       &lt;&#x2F;label&gt;</span><br><span class="line">       &lt;input type&#x3D;&quot;submit&quot; value&#x3D;&quot;Submit&quot; &#x2F;&gt;</span><br><span class="line">     &lt;&#x2F;form&gt;</span><br><span class="line">   );</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>1.<a target="_blank" rel="noopener" href="https://reactjs.org/docs/forms.html#the-select-tag">he-select-tag</a></p>
 
       
     </div>

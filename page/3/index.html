@@ -47,8 +47,10 @@
   };
 </script><script>
 var host = "trumandu.github.io";
-if ((host == window.location.host) && (window.location.protocol == "https:"))
-    window.location.protocol = "http";
+if(host == window.location.host){
+  var new_url = window.location.href.replace('blog.trumandu.top', "trumandu.github.io");  
+  window.location.replace(new_url); 
+} 
 </script>
 
 <title>TrumanDu's Blog</title>
@@ -177,20 +179,20 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -236,6 +238,107 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/" class="post-title-link" itemprop="url">成为一个更好的架构师</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-20 17:47:03" itemprop="dateCreated datePublished" datetime="2020-01-20T17:47:03+08:00">2020-01-20</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="成为一个更好的架构师"><a href="#成为一个更好的架构师" class="headerlink" title="成为一个更好的架构师"></a>成为一个更好的架构师</h1><p>本文翻译于<a target="_blank" rel="noopener" href="https://github.com/justinamiller/SoftwareArchitect">SoftwareArchitect</a>,原创翻译，有删减，介意请查看原文，转载请联系我。</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/3c62fbd3-9d8b-4f39-b431-3c0b1db04794.png" alt="扫码关注我"></p>
+<p>多年前，有人问我:”如何成为软件架构师?”。我认为需要必要的技能，经验以及积累知识所需的时间和奉献精神。</p>
+<h2 id="1-内容"><a href="#1-内容" class="headerlink" title="1. 内容"></a>1. 内容</h2><ul>
+<li>软件架构师的定义</li>
+<li>软件架构的级别</li>
+<li>软件架构师的常规工作内容</li>
+<li>软件架构师的重要技能</li>
+<li>架构师技术路线图</li>
+</ul>
+<h2 id="2-软件架构师的定义"><a href="#2-软件架构师的定义" class="headerlink" title="2. 软件架构师的定义"></a>2. 软件架构师的定义</h2><p>在开始之前，让我们先看看这个定义。</p>
+<ul>
+<li>软件架构师是一位软件专家，他可以进行高层设计选择并决定技术标准，包括软件编码标准，工具和平台。首席专家被称为首席架构师。（来源：Wikipedia: Software Architect）</li>
+</ul>
+<h2 id="3-软件架构的级别"><a href="#3-软件架构的级别" class="headerlink" title="3. 软件架构的级别"></a>3. 软件架构的级别</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/20/%E6%88%90%E4%B8%BA%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1086,103 +1189,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/06/14/%E6%B5%85%E6%9E%90%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">kafka producer源码分析</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-06-14 21:47:42" itemprop="dateCreated datePublished" datetime="2019-06-14T21:47:42+08:00">2019-06-14</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:25" itemprop="dateModified" datetime="2021-07-05T18:07:25+08:00">2021-07-05</time>
-      </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p> Kafka producer源码分析</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在开始文章之前，需要解释是一下为什么要研究producer源码。</p>
-<h3 id="为什么要研究producer源码"><a href="#为什么要研究producer源码" class="headerlink" title="为什么要研究producer源码"></a>为什么要研究producer源码</h3><p>通常producer使用都很简单，初始化一个<code>KafkaProducer</code>实例，然后调用<code>send</code>方法就好，但是我们有了解后面是如何发送到kafka集群的吗？其实我们不知道，其次，到底客户端有几个线程？我们不知道。还有producer还能做什么？我们同样不知道。本篇文章就是想回答一下上面提出的几个问题，能力有限，如有错误，欢迎指出！</p>
-<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>在介绍客户端架构之前，先回答一个问题</p>
-<p>producer到底存在几个线程？<strong>2个</strong>  <strong>Main thread</strong> 和<strong>sender</strong>,其中sender线程负责发送消息，main 线程负责interceptor、序列化、分区等其他操作。</p>
-<p><img src="http://static.trumandu.top/Kafka%20producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-1.jpg"></p>
-<ul>
-<li>Producer首先使用用户主线程将待发送的消息封装进一个ProducerRecord类实例中。</li>
-<li>进行interceptor、序列化、分区等其他操作，发送到Producer程序中RecordAccumulator中。</li>
-<li>Producer的另一个工作线程（即Sender线程），则负责实时地从该缓冲区中提取出准备好的消息封装到一个批次的内，统一发送给对应的broker中。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/06/14/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

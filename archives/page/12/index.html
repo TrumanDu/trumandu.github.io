@@ -47,8 +47,10 @@
   };
 </script><script>
 var host = "trumandu.github.io";
-if ((host == window.location.host) && (window.location.protocol == "https:"))
-    window.location.protocol = "http";
+if(host == window.location.host){
+  var new_url = window.location.href.replace('blog.trumandu.top', "trumandu.github.io");  
+  window.location.replace(new_url); 
+} 
 </script>
 
 <title>归档 | TrumanDu's Blog</title>
@@ -177,20 +179,20 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -245,13 +247,33 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
     <div class="post-content">
       <div class="collection-title">
         
-        <span class="collection-header">很好! 目前共计 125 篇日志。 继续努力。</span>
+        <span class="collection-header">很好! 目前共计 126 篇日志。 继续努力。</span>
       </div>
 
       
     <div class="collection-year">
       <span class="collection-header">2016</span>
     </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2016-06-14T20:27:16+08:00"
+              content="2016-06-14">
+          06-14
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2016/06/14/HBase%E5%B8%B8%E7%94%A8%E7%9A%84%E6%93%8D%E4%BD%9C%E4%B8%80-shell/" itemprop="url">
+            <span itemprop="name">HBase常用的操作一(shell)</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
 
   <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
@@ -426,26 +448,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="post-title">
           <a class="post-title-link" href="/2016/04/15/linux%E7%8E%AF%E5%A2%83jdk%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/" itemprop="url">
             <span itemprop="name">linux环境jdk安装及配置</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2016-04-13T20:32:48+08:00"
-              content="2016-04-13">
-          04-13
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2016/04/13/linux-%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url">
-            <span itemprop="name">linux 问题记录</span>
           </a>
       </div>
 

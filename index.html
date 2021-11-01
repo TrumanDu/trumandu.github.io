@@ -47,8 +47,10 @@
   };
 </script><script>
 var host = "trumandu.github.io";
-if ((host == window.location.host) && (window.location.protocol == "https:"))
-    window.location.protocol = "http";
+if(host == window.location.host){
+  var new_url = window.location.href.replace('blog.trumandu.top', "trumandu.github.io");  
+  window.location.replace(new_url); 
+} 
 </script>
 
 <title>TrumanDu's Blog</title>
@@ -177,20 +179,20 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -236,6 +238,96 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2021/11/01/%E9%9D%A2%E8%AF%95%E7%B3%BB%E5%88%97%E7%AC%94%E8%AE%B0%E4%B9%8Bredis%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
+      <meta itemprop="name" content="Truman">
+      <meta itemprop="description" content="代码改变世界，程序设计人生">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TrumanDu's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/11/01/%E9%9D%A2%E8%AF%95%E7%B3%BB%E5%88%97%E7%AC%94%E8%AE%B0%E4%B9%8Bredis%E7%AF%87/" class="post-title-link" itemprop="url">面试系列笔记之redis篇</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-11-01 17:26:37 / 修改时间：17:29:39" itemprop="dateCreated datePublished" datetime="2021-11-01T17:26:37+08:00">2021-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">面试</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9D%A2%E8%AF%95/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="面试系列笔记-Redis"><a href="#面试系列笔记-Redis" class="headerlink" title="面试系列笔记-Redis"></a>面试系列笔记-Redis</h2><p>本文来自 <a target="_blank" rel="noopener" href="https://github.com/TrumanDu/knowledge/blob/main/%E7%BC%93%E5%AD%98.md">https://github.com/TrumanDu/knowledge/blob/main/%E7%BC%93%E5%AD%98.md</a></p>
+<h3 id="Redis必知知识点"><a href="#Redis必知知识点" class="headerlink" title="Redis必知知识点"></a>Redis必知知识点</h3><h4 id="String"><a href="#String" class="headerlink" title="String"></a>String</h4><p><strong>内部编码</strong>：<code>int（8字节长整型）/embstr（小于等于44字节字符串）/raw（大于44个字节字符串）</code></p>
+<p><strong>适用场景</strong>：共享session、分布式锁，计数器、限流、缓存</p>
+<h4 id="List"><a href="#List" class="headerlink" title="List"></a>List</h4><p><strong>内部编码</strong>：`ziplist（同时满足：所有字符串元素的长度都小于64字节，元素数量小于512个）、quicklist</p>
+<p><strong>适用场景</strong>：消息队列，文章列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">lpush+lpop&#x3D;Stack（栈）</span><br><span class="line">lpush+rpop&#x3D;Queue（队列）</span><br><span class="line">lpsh+ltrim&#x3D;Capped Collection（有限集合）</span><br><span class="line">lpush+brpop&#x3D;Message Queue（消息队列）</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/11/01/%E9%9D%A2%E8%AF%95%E7%B3%BB%E5%88%97%E7%AC%94%E8%AE%B0%E4%B9%8Bredis%E7%AF%87/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1126,116 +1218,6 @@ if ((host == window.location.host) && (window.location.protocol == "https:"))
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/10/14/%E3%80%8AKafka%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%AE%9E%E6%88%98%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://blog.trumandu.top/2020/09/29/Kafka-cluster-%E5%9C%A8%E4%BA%A7%E7%BA%BF%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://static.trumandu.top/logo.JPG">
-      <meta itemprop="name" content="Truman">
-      <meta itemprop="description" content="代码改变世界，程序设计人生">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TrumanDu's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/09/29/Kafka-cluster-%E5%9C%A8%E4%BA%A7%E7%BA%BF%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">Kafka cluster 在产线部署最佳实践</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-09-29 19:20:35" itemprop="dateCreated datePublished" datetime="2020-09-29T19:20:35+08:00">2020-09-29</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-07-05 18:07:24" itemprop="dateModified" datetime="2021-07-05T18:07:24+08:00">2021-07-05</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>记录线上Zookeeper集群和Kafka集群部署过程，操作系统配置，以及一些参数的设置。给大家部署提供一些宝贵意见和参考。部署一个集群，按照官方社区的文档，很容易就搭建一个集群，但是为了更好的发挥集群的性能，有很多设置是可以避免产生不必要的问题，都是在惨痛的教训中产生的经验。</p>
-<p>本文内容来自<strong>Newegg</strong>及 <strong>Confluent</strong> 产线上Kafka cluster运维经验，仅供参考。</p>
-<p>Newegg 产线Kafka版本选择Confluent发行版本,版本对照表：</p>
-<table>
-<thead>
-<tr>
-<th align="left">Confluent Platform</th>
-<th align="left">Apache Kafka</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">5.5.x</td>
-<td align="left">2.5.x</td>
-</tr>
-</tbody></table>
-<p>Docker镜像列表：</p>
-<table>
-<thead>
-<tr>
-<th align="left">Service</th>
-<th align="left">Info</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">Zookeeper</td>
-<td align="left">confluentinc/cp-zookeeper:5.5.1</td>
-</tr>
-<tr>
-<td align="left">Kafka</td>
-<td align="left">confluentinc/cp-kafka:5.5.1</td>
-</tr>
-</tbody></table>
-<h2 id="Zookeeper-Cluster"><a href="#Zookeeper-Cluster" class="headerlink" title="Zookeeper Cluster"></a>Zookeeper Cluster</h2><h3 id="硬件"><a href="#硬件" class="headerlink" title="硬件"></a>硬件</h3><p>内存至少4GB，Zookeeper对swap敏感，应当避免swap。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/09/29/Kafka-cluster-%E5%9C%A8%E4%BA%A7%E7%BA%BF%E9%83%A8%E7%BD%B2%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
