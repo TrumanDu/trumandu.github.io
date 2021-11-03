@@ -47,6 +47,17 @@
     isPost : true,
     lang   : 'zh-CN'
   };
+</script><script>
+var host = "trumandu.github.io";
+
+if(host == window.location.host){
+  var new_url = window.location.href.replace("trumandu.github.io", "blog.trumandu.top");  
+ 
+  if (window.location.protocol == "https:"){
+    new_url=new_url.replace("https","http");
+  }
+   window.location.replace(new_url); 
+} 
 </script>
 
 <title>Kafka cluster 在产线部署最佳实践 | TrumanDu's Blog</title>
